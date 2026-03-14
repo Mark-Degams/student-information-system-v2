@@ -117,7 +117,7 @@ def _seed_students(conn: sqlite3.Connection, count: int):
     )
 
 
-# ── DASHBOARD ─────────────────────────────────────────────────────────────────
+# --- DASHBOARD ------------------------------------------------------------------
 
 def get_dashboard_stats() -> dict:
     with get_db() as conn:
@@ -136,7 +136,7 @@ def get_dashboard_stats() -> dict:
     }
 
 
-# ── COLLEGE ───────────────────────────────────────────────────────────────────
+# --- COLLEGE ------------------------------------------------------------------
 
 def college_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     col_map = {"code": "c.code", "name": "c.name", "programs": "programs"}
@@ -171,7 +171,6 @@ def college_update(old_code: str, code: str, name: str):
 
 def college_delete(code: str):
     with get_db() as conn:
-        # Guard: check for linked programs
         count = conn.execute("SELECT COUNT(*) FROM program WHERE college=?", (code,)).fetchone()[0]
         if count:
             raise ValueError(f"Cannot delete: {count} program(s) still belong to this college.")
@@ -184,7 +183,7 @@ def get_college_codes() -> list:
         return [r[0] for r in conn.execute("SELECT code FROM college ORDER BY code")]
 
 
-# ── PROGRAM ───────────────────────────────────────────────────────────────────
+# --- PROGRAM ------------------------------------------------------------------
 
 def program_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     col_map = {
@@ -244,7 +243,7 @@ def get_program_codes() -> list:
         return [r[0] for r in conn.execute("SELECT code FROM program ORDER BY code")]
 
 
-# ── STUDENT ───────────────────────────────────────────────────────────────────
+# --- STUDENT ------------------------------------------------------------------
 
 def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0):
     col_map = {
@@ -299,6 +298,5 @@ def student_delete(sid: str):
 
 
 def validate_student_id(sid: str) -> bool:
-    """Check YYYY-NNNN format."""
     import re
     return bool(re.match(r"^\d{4}-\d{4}$", sid))

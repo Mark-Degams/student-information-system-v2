@@ -16,30 +16,29 @@ class AppShell(QStackedWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("SSIS – Student Information System")
+        self.setWindowTitle("SSIS - Student Information System")
         self.setMinimumSize(1080, 680)
         self.resize(1300, 800)
         self.setStyleSheet(APP_STYLE)
 
-        self._login_view = LoginView()
-        self._main_win   = MainWindow()
+        self.login_view = LoginView()
+        self.main_win   = MainWindow()
 
-        self.addWidget(self._login_view)  
-        self.addWidget(self._main_win)    
+        self.addWidget(self.login_view)  
+        self.addWidget(self.main_win)    
 
-        self._login_view.login_success.connect(self._on_login)
-        self._main_win.logout_requested.connect(self._on_logout)
+        self.login_view.login_success.connect(self.on_login)
+        self.main_win.logout_requested.connect(self.on_logout)
 
-        self.setCurrentIndex(0)
-
-    def _on_login(self, role: str, name: str):
-        self._main_win.set_user(role, name)
         self.setCurrentIndex(1)
 
-    def _on_logout(self):
-        self._login_view.clear()
-        self.setCurrentIndex(0)
+    def on_login(self, role: str, name: str):
+        self.main_win.set_user(role, name)
+        self.setCurrentIndex(1)
 
+    def on_logout(self):
+        self.login_view.clear()
+        self.setCurrentIndex(0)
 
 def main():
     app = QApplication(sys.argv)
@@ -54,7 +53,6 @@ def main():
     shell = AppShell()
     shell.show()
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()
