@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
@@ -7,7 +6,7 @@ import app.database as db
 
 class StudentWin(TablePage):
     HEADERS   = ["ID Number", "First Name", "Last Name", "Course", "Year", "Gender", "Actions"]
-    SORT_KEYS = ["id", "firstname", "lastname", "course", "year", "gender", "id"]
+    SORT_KEYS = ["id", "firstname", "lastname", "course", "year", "gender", "Actions"]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -17,7 +16,7 @@ class StudentWin(TablePage):
         self.table.setColumnWidth(0, 120)
         self.table.setColumnWidth(1, 140)
         self.table.setColumnWidth(2, 150)
-        self.table.setColumnWidth(3, 110)
+        self.table.setColumnWidth(3, 130)
         self.table.setColumnWidth(4, 65)
         self.table.setColumnWidth(5, 85)
 
@@ -28,7 +27,7 @@ class StudentWin(TablePage):
         self.set_text(row_idx, 0, rec["id"])
         self.set_text(row_idx, 1, rec["firstname"])
         self.set_text(row_idx, 2, rec["lastname"])
-        self.set_text(row_idx, 3, rec["course"])
+        self.set_badge(row_idx, 3, rec["course"], rec.get("college_code"))
         self.set_text(row_idx, 4, str(rec["year"]), Qt.AlignCenter | Qt.AlignVCenter)
         self.set_text(row_idx, 5, rec["gender"])
         self.set_actions(

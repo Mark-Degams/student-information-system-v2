@@ -1,8 +1,3 @@
-"""
-main_window.py
-Main application window: sidebar + stacked content pages.
-Only shown after successful login.
-"""
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QIcon
@@ -22,8 +17,8 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("SSIS - Student Information System")
-        self.setMinimumSize(1080, 680)
-        self.resize(1080, 800)
+        self.setMinimumSize(1100, 680)
+        self.resize(1100, 800)
         self.setStyleSheet(APP_STYLE)
         self.current_page = "dashboard"
         self.build_ui()

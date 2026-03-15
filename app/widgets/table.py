@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from app.widgets.pagination import PaginationBar
+from app.widgets.badge import badge_cell
 
 PAGE_SIZE = 50
 
@@ -32,9 +33,15 @@ class TablePage(QWidget):
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.verticalHeader().setVisible(False)
         self.table.verticalHeader().setDefaultSectionSize(46)
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
-        self.table.horizontalHeader().sectionClicked.connect(self.on_header_click)
+
+        header = self.table.horizontalHeader()
+        header.setStretchLastSection(True)
+        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setSortIndicatorShown(True)
+        header.setSortIndicator(self.sort_col, Qt.AscendingOrder)
+        header.sectionClicked.connect(self.on_header_click)
+        header.installEventFilter(self)
+
         self.set_column_widths()
 
         self.pagination = PaginationBar()
@@ -69,6 +76,9 @@ class TablePage(QWidget):
         item.setTextAlignment(align)
         self.table.setItem(row, col, item)
 
+    def set_badge(self, row: int, col: int, text: str, college_code: str = None):
+        self.table.setCellWidget(row, col, badge_cell(text, college_code))
+
     def set_actions(self, row: int, on_edit, on_delete):
         w   = QWidget()
         lay = QHBoxLayout(w)
@@ -91,17 +101,33 @@ class TablePage(QWidget):
         self.table.setCellWidget(row, self.table.columnCount() - 1, w)
 
     def on_header_click(self, col_idx: int):
+        if self.HEADERS[col_idx] == "Actions":
+            order = Qt.AscendingOrder if self.sort_asc else Qt.DescendingOrder
+            self.table.horizontalHeader().setSortIndicator(self.sort_col, order)
+            return
+        
         if col_idx == self.sort_col:
             self.sort_asc = not self.sort_asc
         else:
             self.sort_col = col_idx
             self.sort_asc = True
+        
+        order = Qt.AscendingOrder if self.sort_asc else Qt.DescendingOrder
+        self.table.horizontalHeader().setSortIndicator(self.sort_col, order)
+
         self.page = 1
         self.load()
 
     def go_page(self, page: int):
         self.page = page
         self.load()
+
+    def eventFilter(self, obj, event):
+        if obj is self.table.horizontalHeader() and event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease):
+            col = obj.logicalIndexAt(event.pos())
+            if col >= 0 and col < len(self.HEADERS) and self.HEADERS[col] == "Actions":
+                return True
+        return super().eventFilter(obj, event)
 
     def fetch(self, q, sort_key, asc, limit, offset):
         raise NotImplementedError

@@ -5,13 +5,11 @@ Centralised Qt stylesheet and colour constants.
 
 BADGE_COLORS: dict = {
     "CCS":  ("#ebf8ff", "#2b6cb0"),
-    "COED": ("#f0fff4", "#276749"),
+    "CED": ("#f0fff4", "#276749"),
     "COE":  ("#faf5ff", "#6b46c1"),
-    "CBA":  ("#fffaf0", "#c05621"),
-    "CAS":  ("#fff5f7", "#c53030"),
-    "CN":   ("#e6fffa", "#285e61"),
-    "CAFA": ("#fffff0", "#744210"),
-    "COL":  ("#fff5f5", "#742a2a"),
+    "CBAA":  ("#fffaf0", "#c05621"),
+    "CASS":  ("#fff5f7", "#c53030"),
+    "CON":   ("#e6fffa", "#285e61"),
 }
 
 APP_STYLE = """
@@ -138,6 +136,14 @@ QHeaderView::section {
     text-transform: uppercase;
 }
 QHeaderView::section:hover { background: #f7f7e0; }
+QHeaderView::section { padding-right: 24px; }
+QHeaderView::up-arrow, QHeaderView::down-arrow {
+    subcontrol-position: right center;
+    margin-right: 10px;
+    width: 12px;
+    height: 12px;
+    color: #718096;
+}
 QHeaderView { background: transparent; }
 
 QPushButton#edit_btn {

@@ -17,8 +17,8 @@ class AppShell(QStackedWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SSIS - Student Information System")
-        self.setMinimumSize(1080, 680)
-        self.resize(1080, 800)
+        self.setMinimumSize(1100, 680)
+        self.resize(1100, 800)
         self.setStyleSheet(APP_STYLE)
 
         self.login_view = LoginView()
