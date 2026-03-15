@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import QLineEdit, QWidget, QHBoxLayout, QPushButton, QLabel
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIntValidator
 
 
 class PaginationBar(QWidget):
@@ -16,7 +17,7 @@ class PaginationBar(QWidget):
         self.layout.setContentsMargins(16, 8, 16, 10)
         self.layout.setSpacing(4)
         self.rebuild()
-
+ 
     def update_state(self, current: int, total_pages: int, total_rows: int, page_size: int):
         self.current     = current
         self.total_pages = max(1, total_pages)
@@ -36,24 +37,46 @@ class PaginationBar(QWidget):
 
         start = (cur - 1) * size + 1
         end   = min(cur * size, self.total_rows)
-        info = QLabel(f"Showing {start}–{end} of {self.total_rows:,} records")
+        info = QLabel(f"Showing {start}-{end} of {self.total_rows:,} records")
         info.setObjectName("page_info")
         self.layout.addWidget(info)
         self.layout.addStretch()
 
-        self.layout.addWidget(self.make_btn("‹", cur - 1, enabled=(cur > 1)))
+        if tot <= 7:
+            for p in range(1, tot + 1):
+                self.layout.addWidget(self.make_btn(str(p), p, active=(p == cur)))
+        else:
+            self.layout.addWidget(self.make_btn("<", cur - 1, enabled=(cur > 1)))
+            pages = self.page_range(cur, tot)
+            prev = None
+            for p in pages:
+                if prev is not None and p - prev > 1:
+                    dots = QLabel("…")
+                    dots.setObjectName("page_info")
+                    self.layout.addWidget(dots)
+                self.layout.addWidget(self.make_btn(str(p), p, active=(p == cur)))
+                prev = p
+            self.layout.addWidget(self.make_btn(">", cur + 1, enabled=(cur < tot)))
 
-        pages = self.page_range(cur, tot)
-        prev  = None
-        for p in pages:
-            if prev is not None and p - prev > 1:
-                dots = QLabel("…")
-                dots.setObjectName("page_info")
-                self.layout.addWidget(dots)
-            self.layout.addWidget(self.make_btn(str(p), p, active=(p == cur)))
-            prev = p
+            goto_label = QLabel("Go to:")
+            goto_label.setObjectName("page_info")
+            goto_label.setContentsMargins(12, 0, 4, 0)
+            self.layout.addWidget(goto_label)
 
-        self.layout.addWidget(self.make_btn("›", cur + 1, enabled=(cur < tot)))
+            self.goto_input = QLineEdit()
+            self.goto_input.setObjectName("page_input")
+            self.goto_input.setFixedWidth(38)
+            self.goto_input.setValidator(QIntValidator(1, tot))
+            self.goto_input.returnPressed.connect(self.goto_page)
+            self.layout.addWidget(self.goto_input)
+
+    def goto_page(self):
+        text = self.goto_input.text()
+        if text.isdigit():
+            page = max(1, min(int(text), self.total_pages))
+            self.page_changed.emit(page)
+            self.goto_input.clear()
+
 
     @staticmethod
     def page_range(cur: int, tot: int) -> list:

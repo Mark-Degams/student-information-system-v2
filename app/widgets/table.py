@@ -44,7 +44,6 @@ class TablePage(QWidget):
         root.addWidget(self.pagination)
 
     def set_column_widths(self):
-        """Override in subclass to set initial column widths."""
         pass
 
     def search(self, q: str):
@@ -57,7 +56,7 @@ class TablePage(QWidget):
         offset   = (self.page - 1) * PAGE_SIZE
         rows, total = self.fetch(self.q, sort_key, self.sort_asc, PAGE_SIZE, offset)
 
-        total_pages = max(1, -(-total // PAGE_SIZE))  # ceiling division
+        total_pages = max(1, -(-total // PAGE_SIZE))
 
         self.table.setRowCount(len(rows))
         for i, record in enumerate(rows):
