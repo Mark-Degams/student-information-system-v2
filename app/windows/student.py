@@ -7,18 +7,23 @@ import app.database as db
 class StudentWin(TablePage):
     HEADERS   = ["ID Number", "First Name", "Last Name", "Course", "Year", "Gender", "Actions"]
     SORT_KEYS = ["id", "firstname", "lastname", "course", "year", "gender", "Actions"]
+    FIXED_WIDTHS = {0: 110, 4: 70, 5: 85, 6: 150}
+    FLEX_RATIOS  = {1: 0.30, 2: 0.35, 3: 0.35} 
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.load()
 
     def set_column_widths(self):
-        self.table.setColumnWidth(0, 120)
-        self.table.setColumnWidth(1, 140)
-        self.table.setColumnWidth(2, 150)
-        self.table.setColumnWidth(3, 130)
-        self.table.setColumnWidth(4, 65)
-        self.table.setColumnWidth(5, 85)
+        for col, w in self.FIXED_WIDTHS.items():
+            self.table.setColumnWidth(col, w)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        fixed_total = sum(self.FIXED_WIDTHS.values())
+        available = self.table.viewport().width() - fixed_total
+        for col, ratio in self.FLEX_RATIOS.items():
+            self.table.setColumnWidth(col, max(60, int(available * ratio)))
 
     def fetch(self, q, sort_key, asc, limit, offset):
         return db.student_list(q, sort_key, asc, limit, offset)

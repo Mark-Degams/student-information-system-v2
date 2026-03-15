@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QIcon
 from PyQt5.QtSvg import QSvgRenderer
 
@@ -21,6 +21,11 @@ class MainWindow(QMainWindow):
         self.resize(1100, 800)
         self.setStyleSheet(APP_STYLE)
         self.current_page = "dashboard"
+
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.timeout.connect(self._perform_search)
+
         self.build_ui()
 
     def build_ui(self):
@@ -214,9 +219,13 @@ class MainWindow(QMainWindow):
             self.dashboard_win.load()
 
     def on_search(self, q: str):
+        self._last_search_query = q
+        self._search_timer.start(200)
+
+    def _perform_search(self):
         view = self.current_table_win()
         if view:
-            view.search(q)
+            view.search(getattr(self, "_last_search_query", ""))
 
     def on_add(self):
         view = self.current_table_win()

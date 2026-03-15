@@ -7,9 +7,9 @@ PAGE_SIZE = 50
 
 
 class TablePage(QWidget):
-    HEADERS:   list = []
+    HEADERS: list = []
     SORT_KEYS: list = []
-
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.page     = 1

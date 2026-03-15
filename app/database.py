@@ -56,67 +56,6 @@ def get_db() -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode = WAL")
     return conn
 
-
-def init_db():
-    with get_db() as conn:
-        conn.executescript("""
-            CREATE TABLE IF NOT EXISTS college (
-                code TEXT PRIMARY KEY,
-                name TEXT NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS program (
-                code    TEXT PRIMARY KEY,
-                name    TEXT NOT NULL,
-                college TEXT NOT NULL,
-                FOREIGN KEY (college) REFERENCES college(code)
-                    ON UPDATE CASCADE ON DELETE RESTRICT
-            );
-            CREATE TABLE IF NOT EXISTS student (
-                id        TEXT PRIMARY KEY,
-                firstname TEXT NOT NULL,
-                lastname  TEXT NOT NULL,
-                course    TEXT NOT NULL,
-                year      INTEGER NOT NULL CHECK(year BETWEEN 1 AND 4),
-                gender    TEXT NOT NULL CHECK(gender IN ('Male','Female')),
-                FOREIGN KEY (course) REFERENCES program(code)
-                    ON UPDATE CASCADE ON DELETE RESTRICT
-            );
-            CREATE INDEX IF NOT EXISTS idx_student_course ON student(course);
-            CREATE INDEX IF NOT EXISTS idx_student_name   ON student(lastname, firstname);
-            CREATE INDEX IF NOT EXISTS idx_program_college ON program(college);
-        """)
-        conn.executemany("INSERT OR IGNORE INTO college(code,name) VALUES(?,?)", COLLEGES)
-        conn.executemany("INSERT OR IGNORE INTO program(code,name,college) VALUES(?,?,?)", PROGRAMS)
-        existing = conn.execute("SELECT COUNT(*) FROM student").fetchone()[0]
-        if existing < 5000:
-            _seed_students(conn, 5000 - existing)
-        conn.commit()
-
-
-def _seed_students(conn: sqlite3.Connection, count: int):
-    prog_codes = [p[0] for p in PROGRAMS]
-    genders = ["Male", "Female"]
-    used = {r[0] for r in conn.execute("SELECT id FROM student")}
-    rows = []
-    while len(rows) < count:
-        sid = f"{random.randint(2018, 2024)}-{random.randint(1, 9999):04d}"
-        if sid in used:
-            continue
-        used.add(sid)
-        rows.append((
-            sid,
-            fake.first_name(),
-            fake.last_name(),
-            random.choice(prog_codes),
-            random.randint(1, 4),
-            random.choice(genders),
-        ))
-    conn.executemany(
-        "INSERT OR IGNORE INTO student(id,firstname,lastname,course,year,gender) VALUES(?,?,?,?,?,?)",
-        rows,
-    )
-
-
 # --- DASHBOARD ------------------------------------------------------------------
 
 def get_dashboard_stats() -> dict:

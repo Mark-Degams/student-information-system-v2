@@ -16,6 +16,9 @@ APP_STYLE = """
 /* ── GLOBAL ─────────────────────────────────────────────────── */
 QMainWindow { background: #f0f2f5; }
 QWidget      { font-family: 'Segoe UI', Arial, sans-serif; }
+QPushButton:focus {
+    outline: none;
+}
 
 /* ── SIDEBAR ─────────────────────────────────────────────────── */
 QWidget#sidebar {
@@ -180,7 +183,7 @@ QLineEdit#page_input {
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     margin: 3px 0px 3px 0px;
-    padding: 1px 6px;
+    padding: 1px 1px;
     font-size: 13px;
     color: #2d3748;
     min-height: 26px;
