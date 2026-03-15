@@ -18,7 +18,7 @@ class AppShell(QStackedWidget):
         super().__init__()
         self.setWindowTitle("SSIS - Student Information System")
         self.setMinimumSize(1080, 680)
-        self.resize(1300, 800)
+        self.resize(1080, 800)
         self.setStyleSheet(APP_STYLE)
 
         self.login_view = LoginView()
@@ -30,7 +30,7 @@ class AppShell(QStackedWidget):
         self.login_view.login_success.connect(self.on_login)
         self.main_win.logout_requested.connect(self.on_logout)
 
-        self.setCurrentIndex(1)
+        self.setCurrentIndex(0)
 
     def on_login(self, role: str, name: str):
         self.main_win.set_user(role, name)

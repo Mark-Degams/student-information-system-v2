@@ -74,17 +74,27 @@ QFrame#card {
 }
 
 /* ── TOP BAR ─────────────────────────────────────────────────── */
+QWidget#search_wrap {
+    background: #e8eaed;
+    border-radius: 20px;
+}
+QWidget#search_wrap[active="true"] {
+    background: #dde1e7;
+}
+QLabel#search_icon {
+    margin-left: 4px;
+}
 QLineEdit#search_box {
     background: #e8eaed;
     border: none;
     border-radius: 20px;
-    padding: 10px 18px 10px 40px;
+    padding: 10px 18px;
     font-size: 14px;
     color: #2d3748;
     min-height: 20px;
 }
 QLineEdit#search_box:focus {
-    background: #dde1e7;
+    background: transparent;
 }
 QPushButton#add_btn {
     background: #38a169;

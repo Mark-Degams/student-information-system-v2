@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("SSIS - Student Information System")
         self.setMinimumSize(1080, 680)
-        self.resize(1300, 800)
+        self.resize(1080, 800)
         self.setStyleSheet(APP_STYLE)
         self.current_page = "dashboard"
         self.build_ui()
@@ -124,29 +124,53 @@ class MainWindow(QMainWindow):
 
         return sidebar
     
+    def search_focus_in(self, event):
+        self.search_wrap.setProperty("active", "true")
+        self.search_wrap.style().unpolish(self.search_wrap)
+        self.search_wrap.style().polish(self.search_wrap)
+        QLineEdit.focusInEvent(self.search_input, event)
+
+    def search_focus_out(self, event):
+        self.search_wrap.setProperty("active", "false")
+        self.search_wrap.style().unpolish(self.search_wrap)
+        self.search_wrap.style().polish(self.search_wrap)
+        QLineEdit.focusOutEvent(self.search_input, event)
+
     def build_content(self) -> QWidget:
         content = QWidget(); content.setObjectName("content_area")
         lay = QVBoxLayout(content); lay.setContentsMargins(20, 16, 20, 20); lay.setSpacing(12)
 
         topbar = QHBoxLayout(); topbar.setSpacing(12)
 
-        search_wrap = QWidget(); sw = QHBoxLayout(search_wrap)
-        sw.setContentsMargins(0, 0, 0, 0); sw.setSpacing(0)
-        self.search_ico = QLabel("🔍")
-        self.search_ico.setStyleSheet(
-            "color:#718096; font-size:14px; padding-left:14px; padding-right:0px;"
-        )
-        self.search_ico.setFixedWidth(36)
-        self.search_input = QLineEdit(); self.search_input.setObjectName("search_box")
-        self.search_input.setPlaceholderText("Search…")
+        self.search_wrap = QWidget()
+        self.search_wrap.setObjectName("search_wrap")
+
+        sw = QHBoxLayout(self.search_wrap)
+        sw.setContentsMargins(12, 0, 12, 0)
+        sw.setSpacing(8)
+
+        base = Path(__file__).resolve().parent
+        icon_path = base / "icons" / "search.svg"
+
+        search_icon = QLabel()
+        search_icon.setPixmap(QIcon(str(icon_path)).pixmap(16, 16))
+        search_icon.setObjectName("search_icon")
+
+        self.search_input = QLineEdit()
+        self.search_input.focusInEvent = self.search_focus_in
+        self.search_input.focusOutEvent = self.search_focus_out
+        self.search_input.setObjectName("search_box")
+        self.search_input.setPlaceholderText("Search...")
         self.search_input.textChanged.connect(self.on_search)
-        sw.addWidget(self.search_ico); sw.addWidget(self.search_input, 1)
+
+        sw.addWidget(search_icon)
+        sw.addWidget(self.search_input)
 
         self.add_btn = QPushButton("+  Add"); self.add_btn.setObjectName("add_btn")
         self.add_btn.setFixedHeight(42)
         self.add_btn.clicked.connect(self.on_add)
 
-        topbar.addWidget(search_wrap, 1); topbar.addWidget(self.add_btn)
+        topbar.addWidget(self.search_wrap, 1); topbar.addWidget(self.add_btn)
         lay.addLayout(topbar)
 
         card = QFrame(); card.setObjectName("card")
@@ -188,8 +212,7 @@ class MainWindow(QMainWindow):
 
         is_dash = (page_id == "dashboard")
         self.add_btn.setVisible(not is_dash)
-        self.search_input.setVisible(not is_dash)
-        self.search_ico.setVisible(not is_dash)
+        self.search_wrap.setVisible(not is_dash)
         self.search_input.clear()
 
         if is_dash:
