@@ -184,7 +184,7 @@ class LoadingScreen(QWidget):
     def on_finished(self):
         self.progress.setValue(100)
         self.status_lbl.setText("Ready!")
-        QTimer.singleShot(0, self.ready.emit)
+        QTimer.singleShot(100, self.ready.emit)
 
     def shutdown(self):
 

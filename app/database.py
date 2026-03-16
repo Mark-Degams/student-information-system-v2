@@ -15,6 +15,7 @@ COLLEGES = [
     ("CON",  "College of Nursing"),
     ("CASS", "College of Arts and Social Sciences"),
     ("CSM",  "College of Science and Mathematics"),
+    ("NA",   "Not Applicable"),
 ]
 
 PROGRAMS = [
@@ -45,6 +46,7 @@ PROGRAMS = [
     ("BSSOC",  "BS Sociology",                           "CASS"),
     ("BSN",    "BS Nursing",                             "CON"),
     ("BSMID",  "BS Midwifery",                           "CON"),
+    ("NA",    "Unenrolled",                             "NA"),
 
 ]
 

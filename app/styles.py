@@ -13,14 +13,14 @@ BADGE_COLORS: dict = {
 }
 
 APP_STYLE = """
-/* ── GLOBAL ─────────────────────────────────────────────────── */
+/* --- GLOBAL ---------------------------------------------------- */
 QMainWindow { background: #f0f2f5; }
 QWidget      { font-family: 'Segoe UI', Arial, sans-serif; }
 QPushButton:focus {
     outline: none;
 }
 
-/* ── SIDEBAR ─────────────────────────────────────────────────── */
+/* --- SIDEBAR ---------------------------------------------------- */
 QWidget#sidebar {
     background: #2d3748;
 }
@@ -66,7 +66,7 @@ QPushButton#logout_btn {
 }
 QPushButton#logout_btn:hover { background: rgba(252,129,129,0.12); }
 
-/* ── CONTENT AREA ────────────────────────────────────────────── */
+/* --- CONTENT AREA ---------------------------------------------------- */
 QWidget#content_area { background: #f0f2f5; }
 QFrame#card {
     background: #fffff0;
@@ -74,7 +74,7 @@ QFrame#card {
     border-radius: 12px;
 }
 
-/* ── TOP BAR ─────────────────────────────────────────────────── */
+/* --- TOP BAR ---------------------------------------------------- */
 QWidget#search_wrap {
     background: #e8eaed;
     border-radius: 20px;
@@ -109,7 +109,7 @@ QPushButton#add_btn {
 }
 QPushButton#add_btn:hover { background: #2f855a; }
 
-/* ── TABLE ───────────────────────────────────────────────────── */
+/* --- TABLE ---------------------------------------------------- */
 QTableWidget {
     background: transparent;
     border: none;
@@ -167,7 +167,7 @@ QScrollBar:vertical { width: 6px; background: transparent; border: none; }
 QScrollBar::handle:vertical { background: #cbd5e0; border-radius: 3px; min-height: 30px; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
 
-/* ── STAT CARDS ──────────────────────────────────────────────── */
+/* --- STAT CARDS ---------------------------------------------------- */
 QFrame#stat_card {
     background: white;
     border: 1px solid #e2e8f0;
@@ -177,7 +177,7 @@ QLabel#stat_icon  { font-size: 26px; }
 QLabel#stat_num   { font-size: 34px; font-weight: 700; color: #2d3748; }
 QLabel#stat_label { font-size: 11px; color: #718096; font-weight: 600; }
 
-/* ── PAGINATION ──────────────────────────────────────────────── */
+/* --- PAGINATION ---------------------------------------------------- */
 QLineEdit#page_input {
     background: white;
     border: 1px solid #e2e8f0;
@@ -209,12 +209,16 @@ QPushButton#page_btn[active="true"] {
 }
 QLabel#page_info { color: #718096; font-size: 13px; }
 
-/* ── DIALOG ──────────────────────────────────────────────────── */
-QDialog  { background: #ffffff; }
-QLabel#dlg_title { font-size: 16px; font-weight: 700; color: #2d3748; }
-QLabel#dlg_lbl   { font-size: 11px; font-weight: 700; color: #718096; }
+/* --- Modals ---------------------------------------------------- */
+QFrame#modal_card {
+                background-color: #ffffff;
+                border-radius: 10px;
+                border: 1px solid #3a3a3a;
+            }
+QLabel#mdl_title { font-size: 16px; font-weight: 700; color: #2d3748; }
+QLabel#mdl_lbl   { font-size: 11px; font-weight: 700; color: #718096; }
 
-QLineEdit#dlg_input, QComboBox#dlg_combo, QSpinBox#dlg_spin {
+QLineEdit#mdl_input, QComboBox#mdl_combo, QSpinBox#mdl_spin {
     background: #ffffff;
     border: 1.5px solid #e2e8f0;
     border-radius: 7px;
@@ -222,15 +226,15 @@ QLineEdit#dlg_input, QComboBox#dlg_combo, QSpinBox#dlg_spin {
     font-size: 14px;
     color: #2d3748;
 }
-QLineEdit#dlg_input:focus, QComboBox#dlg_combo:focus, QSpinBox#dlg_spin:focus {
+QLineEdit#mdl_input:focus, QComboBox#mdl_combo:focus, QSpinBox#mdl_spin:focus {
     border-color: #4a6fa5;
 }
-QComboBox#dlg_combo::drop-down { border: none; width: 24px; }
-QComboBox#dlg_combo QAbstractItemView {
+QComboBox#mdl_combo::drop-down { border: none; width: 24px; }
+QComboBox#mdl_combo QAbstractItemView {
     background: white; border: 1px solid #e2e8f0;
-    selection-background-color: #ebf8ff; color: #2d3748;
+    selection-background-color: #697d87; color: #2d3748;
 }
-QSpinBox#dlg_spin::up-button, QSpinBox#dlg_spin::down-button { width: 18px; }
+QSpinBox#mdl_spin::up-button, QSpinBox#mdl_spin::down-button { width: 18px; }
 
 QPushButton#save_btn {
     background: #38a169; color: white; border: none;
@@ -244,7 +248,7 @@ QPushButton#cancel_btn {
 }
 QPushButton#cancel_btn:hover { background: #e2e8f0; }
 
-/* ── LOGIN ───────────────────────────────────────────────────── */
+/* --- LOGIN ---------------------------------------------------- */
 QWidget#login_bg {
     background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
         stop:0 #4a5568, stop:1 #2d3748);

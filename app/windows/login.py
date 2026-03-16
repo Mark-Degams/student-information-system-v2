@@ -54,14 +54,14 @@ class LoginView(QWidget):
         rb_lay.addWidget(self.tab_student)
         lay.addWidget(role_bar)
 
-        self.lbl_user = QLabel("USERNAME"); self.lbl_user.setObjectName("dlg_lbl")
+        self.lbl_user = QLabel("USERNAME"); self.lbl_user.setObjectName("mdl_lbl")
         lay.addWidget(self.lbl_user)
         self.inp_user = QLineEdit(); self.inp_user.setObjectName("login_input")
         self.inp_user.setPlaceholderText("Enter username")
         self.inp_user.returnPressed.connect(self.do_login)
         lay.addWidget(self.inp_user)
 
-        self.lbl_pass = QLabel("PASSWORD"); self.lbl_pass.setObjectName("dlg_lbl")
+        self.lbl_pass = QLabel("PASSWORD"); self.lbl_pass.setObjectName("mdl_lbl")
         lay.addWidget(self.lbl_pass)
         self.inp_pass = QLineEdit(); self.inp_pass.setObjectName("login_input")
         self.inp_pass.setEchoMode(QLineEdit.Password)
