@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import (
 )
 import app.database as db
 
-
 class StudentModal(QWidget):
     def __init__(self, parent=None, *, sid="", firstname="", lastname="",
                  course="", year=1, gender="Male", edit_mode=False,

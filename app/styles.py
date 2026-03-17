@@ -4,12 +4,13 @@ Centralised Qt stylesheet and colour constants.
 """
 
 BADGE_COLORS: dict = {
-    "CCS":  ("#ebf8ff", "#2b6cb0"),
-    "CED": ("#f0fff4", "#276749"),
-    "COE":  ("#faf5ff", "#6b46c1"),
-    "CBAA":  ("#fffaf0", "#c05621"),
-    "CASS":  ("#fff5f7", "#c53030"),
-    "CON":   ("#e6fffa", "#285e61"),
+    "CCS":  ("#d8fffd", "#018d86"),
+    "CED": ("#E7E7FF", "#1A008F"),
+    "COE":  ("#FCD7D7", "#790000"),
+    "CBAA":  ("#fff7d6", "#e9c524"),
+    "CASS":  ("#daffe1", "#007a14"),
+    "CHS":   ("#DDF3FF", "#016199"),
+    "CSM":   ("#ffeaea", "#ff0000"),
 }
 
 APP_STYLE = """

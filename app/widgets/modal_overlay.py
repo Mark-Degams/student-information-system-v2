@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor
 class ModalOverlay(QWidget):
     def __init__(self, parent: QWidget, content_widget: QWidget):
         super().__init__(parent)
-        self.setAttribute(Qt.WA_TranslucentBackground)  # no dim, fully transparent overlay
+        self.setAttribute(Qt.WA_TranslucentBackground) 
         self.setGeometry(0, 0, parent.width(), parent.height())
 
         self.drag_active = False

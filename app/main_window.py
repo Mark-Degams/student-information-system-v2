@@ -22,9 +22,9 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(APP_STYLE)
         self.current_page = "dashboard"
 
-        self._search_timer = QTimer(self)
-        self._search_timer.setSingleShot(True)
-        self._search_timer.timeout.connect(self._perform_search)
+        self.search_timer = QTimer(self)
+        self.search_timer.setSingleShot(True)
+        self.search_timer.timeout.connect(self.perform_search)
 
         self.build_ui()
 
@@ -217,15 +217,18 @@ class MainWindow(QMainWindow):
 
         if is_dash:
             self.dashboard_win.load()
+        else:
+            QTimer.singleShot(0, lambda: 
+                              (self.current_table_win() or None) and self.current_table_win().refresh_columns())
 
     def on_search(self, q: str):
-        self._last_search_query = q
-        self._search_timer.start(200)
+        self.last_search_query = q
+        self.search_timer.start(200)
 
-    def _perform_search(self):
+    def perform_search(self):
         view = self.current_table_win()
         if view:
-            view.search(getattr(self, "_last_search_query", ""))
+            view.search(getattr(self, "last_search_query", ""))
 
     def on_add(self):
         view = self.current_table_win()

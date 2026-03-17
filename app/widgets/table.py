@@ -3,12 +3,14 @@ from PyQt5.QtCore import Qt, QEvent
 from app.widgets.pagination import PaginationBar
 from app.widgets.badge import badge_cell
 
-PAGE_SIZE = 50
+PAGE_SIZE = 1
 
 
 class TablePage(QWidget):
     HEADERS: list = []
     SORT_KEYS: list = []
+    FIXED_WIDTHS: dict = {}
+    FLEX_RATIOS: dict = {}
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -42,7 +44,7 @@ class TablePage(QWidget):
         header.sectionClicked.connect(self.on_header_click)
         header.installEventFilter(self)
 
-        self.set_column_widths()
+        self.refresh_columns()
 
         self.pagination = PaginationBar()
         self.pagination.page_changed.connect(self.go_page)
@@ -50,8 +52,20 @@ class TablePage(QWidget):
         root.addWidget(self.table, 1)
         root.addWidget(self.pagination)
 
-    def set_column_widths(self):
-        pass
+    def refresh_columns(self):
+        for col, w in self.FIXED_WIDTHS.items():
+            self.table.setColumnWidth(col, w)
+        if self.FLEX_RATIOS:
+            fixed_total = sum(self.FIXED_WIDTHS.values())
+            available = self.table.viewport().width() - fixed_total
+            for col, ratio in self.FLEX_RATIOS.items():
+                self.table.setColumnWidth(col, max(60, int(available * ratio)))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.refresh_columns()
+        if getattr(self, "overlay", None):
+            self.overlay.setGeometry(0, 0, self.width(), self.height())
 
     def search(self, q: str):
         self.q    = q
@@ -123,10 +137,12 @@ class TablePage(QWidget):
         self.load()
 
     def eventFilter(self, obj, event):
+        exc_cols = ["Actions", "Students", "Programs"]
         if obj is self.table.horizontalHeader() and event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease):
             col = obj.logicalIndexAt(event.pos())
-            if col >= 0 and col < len(self.HEADERS) and self.HEADERS[col] == "Actions":
-                return True
+            if col >= 0 and col < len(self.HEADERS):
+                if self.HEADERS[col] in exc_cols:
+                    return True
         return super().eventFilter(obj, event)
 
     def fetch(self, q, sort_key, asc, limit, offset):

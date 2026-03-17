@@ -12,10 +12,9 @@ COLLEGES = [
     ("CED",  "College of Education"),
     ("COE",  "College of Engineering"),
     ("CBAA",  "College of Business Administration and Accountancy"),
-    ("CON",  "College of Nursing"),
+    ("CHS",  "College of Health Sciences"),
     ("CASS", "College of Arts and Social Sciences"),
     ("CSM",  "College of Science and Mathematics"),
-    ("NA",   "Not Applicable"),
 ]
 
 PROGRAMS = [
@@ -44,10 +43,8 @@ PROGRAMS = [
     ("BSBIO",  "BS Biology",                             "CASS"),
     ("ABCOMM", "AB Communication",                       "CASS"),
     ("BSSOC",  "BS Sociology",                           "CASS"),
-    ("BSN",    "BS Nursing",                             "CON"),
-    ("BSMID",  "BS Midwifery",                           "CON"),
-    ("NA",    "Unenrolled",                             "NA"),
-
+    ("BSN",    "BS Nursing",                             "CHS"),
+    ("BSMID",  "BS Midwifery",                           "CHS"),
 ]
 
 
