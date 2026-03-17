@@ -9,8 +9,8 @@ import app.database as db
 class StudentWin(TablePage):
     HEADERS = ["ID Number", "First Name", "Last Name", "Course", "Year", "Gender", "Actions"]
     SORT_KEYS = ["id", "firstname", "lastname", "course", "year", "gender", "actions"]
-    FIXED_WIDTHS = {0: 110, 4: 70, 5: 85, 6: 150}
-    FLEX_RATIOS = {1: 0.30, 2: 0.35, 3: 0.35} 
+    FIXED_WIDTHS = {0: 110, 3: 150, 4: 70, 5: 85, 6: 150}
+    FLEX_RATIOS = {1: 0.45, 2: 0.50} 
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -43,20 +43,19 @@ class StudentWin(TablePage):
             on_delete=lambda _, r=rec: self.delete(r),
         )
 
-    def delete(self, rec):
-        reply = QMessageBox.question(
-            self, "Confirm Delete",
-            f"Delete student '{rec['firstname']} {rec['lastname']}' ({rec['id']})?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+    def add_new(self):
+        def on_save(data):
+            try:
+                db.student_add(*data)
+                self.close_modal()
+                self.load()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = StudentModal(
+            on_save=on_save, on_cancel=self.close_modal,
         )
-        if reply != QMessageBox.Yes:
-            return
-        try:
-            db.student_delete(rec["id"])
-            self.load()
-        except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+        self.open_modal(mdl)
 
     def edit(self, rec):
         def on_save(data):
@@ -74,16 +73,17 @@ class StudentWin(TablePage):
         )
         self.open_modal(mdl)
 
-    def add_new(self):
-        def on_save(data):
-            try:
-                db.student_add(*data)
-                self.close_modal()
-                self.load()
-            except Exception as e:
-                QMessageBox.critical(self, "Error", str(e))
-
-        mdl = StudentModal(
-            on_save=on_save, on_cancel=self.close_modal,
+    def delete(self, rec):
+        reply = QMessageBox.question(
+            self, "Confirm Delete",
+            f"Delete student '{rec['firstname']} {rec['lastname']}' ({rec['id']})?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
         )
-        self.open_modal(mdl)
+        if reply != QMessageBox.Yes:
+            return
+        try:
+            db.student_delete(rec["id"])
+            self.load()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))

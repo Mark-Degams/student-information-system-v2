@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
+from app.modals.program_modal import ProgramModal
 import app.database as db
 
 class ProgramWin(TablePage):
@@ -14,6 +15,16 @@ class ProgramWin(TablePage):
         super().__init__(parent)
         self.overlay = None
         self.load()
+
+    def open_modal(self, modal_widget: ProgramModal):
+        self.close_modal()            
+        self.overlay = ModalOverlay(self, modal_widget)
+        self.overlay.setGeometry(0, 0, self.width(), self.height())
+
+    def close_modal(self):
+        if self.overlay:
+            self.overlay.close_overlay()
+            self.overlay = None
 
     def fetch(self, q, sort_key, asc, limit, offset):
         return db.program_list(q, sort_key, asc, limit, offset)
@@ -30,10 +41,32 @@ class ProgramWin(TablePage):
         )
 
     def add_new(self):
-        pass
+        def on_save(code, name, college):
+            try:
+                db.program_add(code, name, college)
+                self.close_modal()
+                self.load()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = ProgramModal(self, on_save=on_save, on_cancel=self.close_modal)
+        self.open_modal(mdl)
 
     def edit(self, rec):
-        pass
+        def on_save(code, name, college):
+            try:
+                db.program_update(rec["code"], code, name, college)
+                self.close_modal()
+                self.load()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = ProgramModal(
+            self, code=rec["code"], name=rec["name"],
+            college=rec["college"], edit_mode=True, on_save=on_save, 
+            on_cancel=self.close_modal,
+        )
+        self.open_modal(mdl)
 
     def delete(self, rec):
         reply = QMessageBox.question(

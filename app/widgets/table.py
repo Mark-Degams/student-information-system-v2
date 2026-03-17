@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QEvent
 from app.widgets.pagination import PaginationBar
 from app.widgets.badge import badge_cell
 
-PAGE_SIZE = 1
+PAGE_SIZE = 50
 
 
 class TablePage(QWidget):

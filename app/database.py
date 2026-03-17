@@ -179,6 +179,10 @@ def program_delete(code: str):
 def get_program_codes() -> list:
     with get_db() as conn:
         return [r[0] for r in conn.execute("SELECT code FROM program ORDER BY code")]
+    
+def code_exists(code: str) -> bool:
+    with get_db() as conn:
+        return conn.execute("SELECT 1 FROM program WHERE code=?", (code,)).fetchone() is not None
 
 
 # --- STUDENT ------------------------------------------------------------------
@@ -220,11 +224,11 @@ def student_add(sid: str, firstname: str, lastname: str, course: str, year: int,
         conn.commit()
 
 
-def student_update(old_id: str, sid: str, firstname: str, lastname: str, course: str, year: int, gender: str):
+def student_update(sid: str, firstname: str, lastname: str, course: str, year: int, gender: str):
     with get_db() as conn:
         conn.execute(
             "UPDATE student SET id=?,firstname=?,lastname=?,course=?,year=?,gender=? WHERE id=?",
-            (sid, firstname, lastname, course, year, gender, old_id),
+            (sid, firstname, lastname, course, year, gender, sid),
         )
         conn.commit()
 

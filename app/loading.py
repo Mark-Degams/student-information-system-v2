@@ -5,7 +5,7 @@ from PyQt5.QtCore    import Qt, QThread, pyqtSignal, QTimer
 class DBInitWorker(QThread):
     progress = pyqtSignal(int, str) 
     finished = pyqtSignal()
-    needed = 20000
+    needed = 50000
 
     def run(self):
         import random

@@ -1,7 +1,4 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QComboBox, QSpinBox, QPushButton, QMessageBox,
-)
+from PyQt5.QtWidgets import *
 import app.database as db
 
 class StudentModal(QWidget):
@@ -9,13 +6,13 @@ class StudentModal(QWidget):
                  course="", year=1, gender="Male", edit_mode=False,
                  on_save=None, on_cancel=None):
         super().__init__(parent)
-        self._edit_mode = edit_mode
-        self._on_save   = on_save
-        self._on_cancel = on_cancel
+        self.edit_mode = edit_mode
+        self.on_save   = on_save
+        self.on_cancel = on_cancel
         self.setFixedWidth(500)
-        self._build_ui(sid, firstname, lastname, course, year, gender)
+        self.build_ui(sid, firstname, lastname, course, year, gender)
 
-    def _build_ui(self, sid, firstname, lastname, course, year, gender):
+    def build_ui(self, sid, firstname, lastname, course, year, gender):
         lay = QVBoxLayout(self)
         lay.setSpacing(14)
         lay.setContentsMargins(30, 28, 30, 28)
@@ -26,7 +23,7 @@ class StudentModal(QWidget):
         self.inp_id.setObjectName("mdl_input")
         self.inp_id.setPlaceholderText("e.g. 2024-0001")
         self.inp_id.setMaxLength(9)
-        if self._edit_mode:
+        if self.edit_mode:
             self.inp_id.setReadOnly(True)
         lay.addWidget(self.inp_id)
 
@@ -67,21 +64,40 @@ class StudentModal(QWidget):
         btns = QHBoxLayout(); btns.setSpacing(10); btns.addStretch()
         cancel = QPushButton("Cancel"); cancel.setObjectName("cancel_btn")
         save   = QPushButton("Save");   save.setObjectName("save_btn")
-        cancel.clicked.connect(self._handle_cancel)
-        save.clicked.connect(self._validate_and_save)
+        cancel.clicked.connect(self.handle_cancel)
+        save.clicked.connect(self.validate_and_save)
         btns.addWidget(cancel)
         btns.addWidget(save)
         lay.addLayout(btns)
 
-    def _handle_cancel(self):
-        if self._on_cancel:
-            self._on_cancel()
+    def handle_cancel(self):
+        if self.on_cancel:
+            self.on_cancel()
+        self.close()
 
-    def _validate_and_save(self):
+    def validate_and_save(self):
         sid = self.inp_id.text().strip()
         if not db.validate_student_id(sid):
             QMessageBox.warning(self, "Validation", "ID must be in YYYY-NNNN format (e.g. 2024-0001).")
             self.inp_id.setFocus()
             return
         if not self.inp_fn.text().strip():
-            QMessageBox.wa
+            QMessageBox.warning(self, "Validation", "First name is required.")
+            return
+        if not self.inp_ln.text().strip():
+            QMessageBox.warning(self, "Validation", "Last name is required.")
+            return
+        if self.on_save:
+            self.on_save(self.get_data())
+        self.close()
+
+    def get_data(self) -> tuple:
+        return (
+            self.inp_id.text().strip(),
+            self.inp_fn.text().strip(),
+            self.inp_ln.text().strip(),
+            self.inp_course.currentText(),
+            self.inp_year.value(),
+            self.inp_gender.currentText(),
+        )
+    

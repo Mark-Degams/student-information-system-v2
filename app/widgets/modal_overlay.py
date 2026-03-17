@@ -28,8 +28,8 @@ class ModalOverlay(QWidget):
 
         self.center_card()
 
-        self.card.mousePressEvent   = self.card_mouse_press
-        self.card.mouseMoveEvent    = self.card_mouse_move
+        self.card.mousePressEvent = self.card_mouse_press
+        self.card.mouseMoveEvent = self.card_mouse_move
         self.card.mouseReleaseEvent = self.card_mouse_release
 
         self.raise_()
