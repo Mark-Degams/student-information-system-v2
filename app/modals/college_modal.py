@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QColor
-from PyQt5.QtCore import Qt
-from app.styles import load_badge_colors, save_badge_color
+from app.widgets.badge import load_badge_colors, save_badge_color
 import app.database as db
 
 class CollegeModal(QWidget):

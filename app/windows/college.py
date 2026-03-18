@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
 from app.modals.college_modal import CollegeModal
-from app.styles import delete_badge_color
+from app.widgets.badge import delete_badge_color
 import app.database as db
 
 class CollegeWin(TablePage):

@@ -2,8 +2,6 @@ import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QApplication
 from PyQt5.QtCore    import Qt, QThread, pyqtSignal, QTimer
 
-from app.styles import COLORS_FILE
-
 class DBInitWorker(QThread):
     progress = pyqtSignal(int, str) 
     finished = pyqtSignal()
