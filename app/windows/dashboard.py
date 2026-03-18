@@ -1,6 +1,9 @@
+from email.mime import base
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPainter, QColor, QPixmap
+from PyQt5.QtSvg import QSvgRenderer
 from pathlib import Path
 import app.database as db
 
@@ -21,6 +24,8 @@ class DashboardWin(QWidget):
         student_icon = QIcon(str(base / "icons/person.svg"))
         program_icon = QIcon(str(base / "icons/program.svg"))
         college_icon = QIcon(str(base / "icons/college.svg"))
+        un_std_icon = self.colored_svg_icon(base / "icons/person.svg",  "#e53e3e")
+        un_prog_icon = self.colored_svg_icon(base / "icons/program.svg", "#e53e3e")
 
         row = QHBoxLayout()
         row.setSpacing(16)
@@ -28,12 +33,22 @@ class DashboardWin(QWidget):
         self.card_students = self.stat_card(student_icon, "—", "Total Students")
         self.card_programs = self.stat_card(program_icon, "—", "Total Programs")
         self.card_colleges = self.stat_card(college_icon, "—", "Total Colleges")
+        self.card_un_std   = self.stat_card(un_std_icon, "—", "Total Unenrolled Students", icon_is_pixmap=True)
+        self.card_un_prog  = self.stat_card(un_prog_icon, "—", "Total Unassigned Programs", icon_is_pixmap=True)
 
-        row.addWidget(self.card_students)
-        row.addWidget(self.card_programs)
-        row.addWidget(self.card_colleges)
+        row1 = QHBoxLayout()
+        row1.setSpacing(16)
+        row1.addWidget(self.card_students)
+        row1.addWidget(self.card_programs)
+        row1.addWidget(self.card_colleges)
 
-        lay.addLayout(row)
+        row2 = QHBoxLayout()
+        row2.setSpacing(16)
+        row2.addWidget(self.card_un_std)
+        row2.addWidget(self.card_un_prog)
+
+        lay.addLayout(row1)
+        lay.addLayout(row2)
 
         sec = QLabel("Recently Enrolled Students")
         sec.setStyleSheet(
@@ -61,7 +76,7 @@ class DashboardWin(QWidget):
         lay.addWidget(self.table, 1)
 
     @staticmethod
-    def stat_card(icon: QIcon, num: str, label: str) -> QFrame:
+    def stat_card(icon, num: str, label: str, icon_is_pixmap=False) -> QFrame:
         card = QFrame()
         card.setObjectName("stat_card")
         card.setFrameShape(QFrame.NoFrame)
@@ -74,7 +89,7 @@ class DashboardWin(QWidget):
         ico = QLabel()
         ico.setObjectName("stat_icon")
         ico.setAlignment(Qt.AlignCenter)
-        ico.setPixmap(icon.pixmap(32, 32))  
+        ico.setPixmap(icon if icon_is_pixmap else icon.pixmap(32, 32)) 
 
         n = QLabel(num)
         n.setObjectName("stat_num")
@@ -90,6 +105,18 @@ class DashboardWin(QWidget):
 
         card.num_lbl = n
         return card
+    
+    @staticmethod
+    def colored_svg_icon(path, color, size=32):
+        renderer = QSvgRenderer(str(path))
+        pixmap = QPixmap(size, size)
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.fillRect(pixmap.rect(), QColor(color))
+        painter.end()
+        return pixmap
 
     def load(self):
         stats = db.get_dashboard_stats()
@@ -97,6 +124,8 @@ class DashboardWin(QWidget):
         self.card_students.num_lbl.setText(f"{stats['students']:,}")
         self.card_programs.num_lbl.setText(f"{stats['programs']:,}")
         self.card_colleges.num_lbl.setText(f"{stats['colleges']:,}")
+        self.card_un_std.num_lbl.setText(f"{stats['un_std']:,}")
+        self.card_un_prog.num_lbl.setText(f"{stats['un_prog']:,}")
 
         recent = stats["recent"]
         self.table.setRowCount(len(recent))

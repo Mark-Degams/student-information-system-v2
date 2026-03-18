@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
 from app.modals.program_modal import ProgramModal
+from app.modals.delete_modal import DeleteModal
 import app.database as db
 
 class ProgramWin(TablePage):
@@ -32,7 +33,7 @@ class ProgramWin(TablePage):
     def populate_row(self, row_idx, rec):
         self.set_text(row_idx, 0, rec["code"])
         self.set_text(row_idx, 1, rec["name"])
-        self.set_badge(row_idx, 2, f"{rec['college']}", rec["college"])
+        self.set_badge(row_idx, 2, rec["college"] or "N/A", rec["college"] or "")
         self.set_text(row_idx, 3, str(rec["students"]), Qt.AlignCenter | Qt.AlignVCenter)
         self.set_actions(
             row_idx,
@@ -69,19 +70,30 @@ class ProgramWin(TablePage):
         self.open_modal(mdl)
 
     def delete(self, rec):
-        reply = QMessageBox.question(
-            self, "Confirm Delete",
-            f"Delete program '{rec['code']} - {rec['name']}'?\n"
-            f"This will fail if students are still enrolled.",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+        affected = db.students_by_program(rec["code"]) 
+        rows = [[s["id"], s["firstname"], s["lastname"]] for s in affected]
+
+        def on_confirm():
+            try:
+                db.program_delete(rec["code"])
+                self.close_modal()
+                self.load()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = DeleteModal(
+            self,
+            title=f"Delete '{rec['code']}'?",
+            message=(
+                f"You are about to delete the program \"{rec['name']}\".\n"
+                f"All enrolled students will have their course set to None."
+            ),
+            affected_label=f"Affected Students ({len(affected)})",
+            headers=["ID", "First Name", "Last Name"],
+            rows=rows,
+            visible_rows=5,
+            on_confirm=on_confirm,
+            on_cancel=self.close_modal,
+            danger_label="Delete Program",
         )
-        if reply != QMessageBox.Yes:
-            return
-        try:
-            db.program_delete(rec["code"])
-            self.load()
-        except ValueError as e:
-            QMessageBox.warning(self, "Cannot Delete", str(e))
-        except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+        self.open_modal(mdl)

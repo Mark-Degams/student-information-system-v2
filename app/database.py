@@ -62,6 +62,8 @@ def get_dashboard_stats() -> dict:
         students = conn.execute("SELECT COUNT(*) FROM student").fetchone()[0]
         programs = conn.execute("SELECT COUNT(*) FROM program").fetchone()[0]
         colleges = conn.execute("SELECT COUNT(*) FROM college").fetchone()[0]
+        un_std = conn.execute("SELECT COUNT(*) FROM student WHERE course IS NULL").fetchone()[0]
+        un_prog = conn.execute("SELECT COUNT(*) FROM program WHERE college IS NULL").fetchone()[0]
         recent   = conn.execute(
             "SELECT id, firstname||' '||lastname AS name, course, year "
             "FROM student ORDER BY ROWID DESC LIMIT 10"
@@ -70,6 +72,8 @@ def get_dashboard_stats() -> dict:
         "students": students,
         "programs": programs,
         "colleges": colleges,
+        "un_std": un_std,
+        "un_prog": un_prog,
         "recent":   [dict(r) for r in recent],
     }
 
@@ -94,7 +98,6 @@ def college_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
         ).fetchone()[0]
     return [dict(r) for r in rows], total
 
-
 def college_add(code: str, name: str):
     with get_db() as conn:
         conn.execute("INSERT INTO college(code,name) VALUES(?,?)", (code.upper(), name))
@@ -106,15 +109,11 @@ def college_update(old_code: str, code: str, name: str):
         conn.execute("UPDATE college SET code=?,name=? WHERE code=?", (code.upper(), name, old_code))
         conn.commit()
 
-
 def college_delete(code: str):
     with get_db() as conn:
-        count = conn.execute("SELECT COUNT(*) FROM program WHERE college=?", (code,)).fetchone()[0]
-        if count:
-            raise ValueError(f"Cannot delete: {count} program(s) still belong to this college.")
+        conn.execute("UPDATE program SET college=NULL WHERE college=?", (code,))
         conn.execute("DELETE FROM college WHERE code=?", (code,))
         conn.commit()
-
 
 def get_college_codes() -> list:
     with get_db() as conn:
@@ -138,29 +137,43 @@ def program_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     order = f"{col_map.get(sort_col, 'p.code')} {'ASC' if sort_asc else 'DESC'}"
     like  = f"%{q}%"
     with get_db() as conn:
-        rows  = conn.execute(
-            f"SELECT p.code, p.name, p.college, c.name AS college_name, "
-            f"COUNT(s.id) AS students "
-            f"FROM program p "
-            f"LEFT JOIN college c ON c.code=p.college "
-            f"LEFT JOIN student s ON s.course=p.code "
-            f"WHERE p.code LIKE ? OR p.name LIKE ? OR c.name LIKE ? "
-            f"GROUP BY p.code ORDER BY {order} LIMIT ? OFFSET ?",
-            (like, like, like, limit, offset),
-        ).fetchall()
-        total = conn.execute(
-            "SELECT COUNT(*) FROM program p LEFT JOIN college c ON c.code=p.college "
-            "WHERE p.code LIKE ? OR p.name LIKE ? OR c.name LIKE ?",
-            (like, like, like),
-        ).fetchone()[0]
+        null_search = q.strip().lower() in ("null", "none", "n/a", "unassigned")
+        if null_search:
+            rows = conn.execute(
+                f"SELECT p.code, p.name, p.college, c.name AS college_name, "
+                f"COUNT(s.id) AS students "
+                f"FROM program p "
+                f"LEFT JOIN college c ON c.code=p.college "
+                f"LEFT JOIN student s ON s.course=p.code "
+                f"WHERE p.college IS NULL "
+                f"GROUP BY p.code ORDER BY {order} LIMIT ? OFFSET ?",
+                (limit, offset),
+            ).fetchall()
+            total = conn.execute(
+                "SELECT COUNT(*) FROM program WHERE college IS NULL"
+            ).fetchone()[0]
+        else:
+            rows = conn.execute(
+                f"SELECT p.code, p.name, p.college, c.name AS college_name, "
+                f"COUNT(s.id) AS students "
+                f"FROM program p "
+                f"LEFT JOIN college c ON c.code=p.college "
+                f"LEFT JOIN student s ON s.course=p.code "
+                f"WHERE p.code LIKE ? OR p.name LIKE ? OR c.name LIKE ? "
+                f"GROUP BY p.code ORDER BY {order} LIMIT ? OFFSET ?",
+                (like, like, like, limit, offset),
+            ).fetchall()
+            total = conn.execute(
+                "SELECT COUNT(*) FROM program p LEFT JOIN college c ON c.code=p.college "
+                "WHERE p.code LIKE ? OR p.name LIKE ? OR c.name LIKE ?",
+                (like, like, like),
+            ).fetchone()[0]
     return [dict(r) for r in rows], total
-
 
 def program_add(code: str, name: str, college: str):
     with get_db() as conn:
         conn.execute("INSERT INTO program(code,name,college) VALUES(?,?,?)", (code.upper(), name, college))
         conn.commit()
-
 
 def program_update(old_code: str, code: str, name: str, college: str):
     with get_db() as conn:
@@ -170,15 +183,11 @@ def program_update(old_code: str, code: str, name: str, college: str):
         )
         conn.commit()
 
-
 def program_delete(code: str):
     with get_db() as conn:
-        count = conn.execute("SELECT COUNT(*) FROM student WHERE course=?", (code,)).fetchone()[0]
-        if count:
-            raise ValueError(f"Cannot delete: {count} student(s) are enrolled in this program.")
+        conn.execute("UPDATE student SET course=NULL WHERE course=?", (code,))
         conn.execute("DELETE FROM program WHERE code=?", (code,))
         conn.commit()
-
 
 def get_program_codes() -> list:
     with get_db() as conn:
@@ -187,6 +196,14 @@ def get_program_codes() -> list:
 def program_code_exists(code: str) -> bool:
     with get_db() as conn:
         return conn.execute("SELECT 1 FROM program WHERE code=?", (code,)).fetchone() is not None
+    
+def programs_by_college(college_code: str) -> list:
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT code, name FROM program WHERE college=? ORDER BY code",
+            (college_code,)
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 # --- STUDENT ------------------------------------------------------------------
@@ -203,21 +220,34 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0):
     order = f"{col_map.get(sort_col, 's.id')} {'ASC' if sort_asc else 'DESC'}"
     like  = f"%{q}%"
     with get_db() as conn:
-        rows  = conn.execute(
-            f"SELECT s.id, s.firstname, s.lastname, s.course, s.year, s.gender, "
-            f"p.name AS program_name, p.college AS college_code "
-            f"FROM student s LEFT JOIN program p ON p.code=s.course "
-            f"WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ? "
-            f"ORDER BY {order} LIMIT ? OFFSET ?",
-            (like, like, like, like, limit, offset),
-        ).fetchall()
-        total = conn.execute(
-            "SELECT COUNT(*) FROM student s "
-            "WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ?",
-            (like, like, like, like),
-        ).fetchone()[0]
+        null_search = q.strip().lower() in ("null", "none", "n/a", "unenrolled")
+        if null_search:
+            rows = conn.execute(
+                f"SELECT s.id, s.firstname, s.lastname, s.course, s.year, s.gender, "
+                f"p.name AS program_name, p.college AS college_code "
+                f"FROM student s LEFT JOIN program p ON p.code=s.course "
+                f"WHERE s.course IS NULL "
+                f"ORDER BY {order} LIMIT ? OFFSET ?",
+                (limit, offset),
+            ).fetchall()
+            total = conn.execute(
+                "SELECT COUNT(*) FROM student WHERE course IS NULL"
+            ).fetchone()[0]
+        else:
+            rows = conn.execute(
+                f"SELECT s.id, s.firstname, s.lastname, s.course, s.year, s.gender, "
+                f"p.name AS program_name, p.college AS college_code "
+                f"FROM student s LEFT JOIN program p ON p.code=s.course "
+                f"WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ? "
+                f"ORDER BY {order} LIMIT ? OFFSET ?",
+                (like, like, like, like, limit, offset),
+            ).fetchall()
+            total = conn.execute(
+                "SELECT COUNT(*) FROM student s "
+                "WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ?",
+                (like, like, like, like),
+            ).fetchone()[0]
     return [dict(r) for r in rows], total
-
 
 def student_add(sid: str, firstname: str, lastname: str, course: str, year: int, gender: str):
     with get_db() as conn:
@@ -227,7 +257,6 @@ def student_add(sid: str, firstname: str, lastname: str, course: str, year: int,
         )
         conn.commit()
 
-
 def student_update(sid: str, firstname: str, lastname: str, course: str, year: int, gender: str):
     with get_db() as conn:
         conn.execute(
@@ -236,13 +265,19 @@ def student_update(sid: str, firstname: str, lastname: str, course: str, year: i
         )
         conn.commit()
 
-
 def student_delete(sid: str):
     with get_db() as conn:
         conn.execute("DELETE FROM student WHERE id=?", (sid,))
         conn.commit()
 
-
 def validate_student_id(sid: str) -> bool:
     import re
     return bool(re.match(r"^\d{4}-\d{4}$", sid))
+
+def students_by_program(program_code: str) -> list:
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, firstname, lastname FROM student WHERE course=? ORDER BY id",
+            (program_code,)
+        ).fetchall()
+    return [dict(r) for r in rows]

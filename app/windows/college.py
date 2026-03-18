@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
 from app.modals.college_modal import CollegeModal
+from app.modals.delete_modal import DeleteModal
 from app.widgets.badge import delete_badge_color
 import app.database as db
 
@@ -69,20 +70,31 @@ class CollegeWin(TablePage):
         self.open_modal(mdl)
 
     def delete(self, rec):
-        reply = QMessageBox.question(
-            self, "Confirm Delete",
-            f"Delete college '{rec['code']} - {rec['name']}'?\n"
-            f"This will fail if programs are still linked to it.",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+        affected = db.programs_by_college(rec["code"]) 
+        rows = [[p["code"], p["name"]] for p in affected]
+
+        def on_confirm():
+            try:
+                db.college_delete(rec["code"])
+                delete_badge_color(rec["code"])
+                self.close_modal()
+                self.load()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = DeleteModal(
+            self,
+            title=f"Delete '{rec['code']}'?",
+            message=(
+                f"You are about to delete the college \"{rec['name']}\".\n"
+                f"All linked programs will have their college set to None."
+            ),
+            affected_label=f"Affected Programs ({len(affected)})",
+            headers=["Code", "Name"],
+            rows=rows,
+            visible_rows=3,
+            on_confirm=on_confirm,
+            on_cancel=self.close_modal,
+            danger_label="Delete College",
         )
-        if reply != QMessageBox.Yes:
-            return
-        try:
-            db.college_delete(rec["code"])
-            delete_badge_color(rec["code"])
-            self.load()
-        except ValueError as e:
-            QMessageBox.warning(self, "Cannot Delete", str(e))
-        except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+        self.open_modal(mdl)

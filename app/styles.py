@@ -244,7 +244,6 @@ QPushButton#color_btn {
     border-radius:10px; 
     border:1px solid #e2e8f0;
 }
-
 QPushButton#save_btn {
     background: #38a169; color: white; border: none;
     border-radius: 7px; padding: 10px 26px;
@@ -256,6 +255,35 @@ QPushButton#cancel_btn {
     border-radius: 7px; padding: 10px 26px; font-size: 14px;
 }
 QPushButton#cancel_btn:hover { background: #e2e8f0; }
+QPushButton#danger_btn {
+    background: #e53e3e; color: white; border: none;
+    border-radius: 7px; padding: 10px 26px;
+    font-size: 14px; font-weight: 600;
+}
+QPushButton#danger_btn:hover { background: #c53030; }
+
+QLabel#mdl_message {
+    font-size: 13px; color: #4a5568;
+}
+QFrame#mdl_divider {
+    color: #e2e8f0; max-height: 1px;
+    background: #e2e8f0; border: none;
+}
+QTableWidget#delete_table {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 12px;
+    background: #f7fafc;
+    gridline-color: #e2e8f0;
+}
+QTableWidget#delete_table QHeaderView::section {
+    background: #f0f2f5;
+    font-size: 11px;
+    font-weight: 700;
+    color: #718096;
+    padding: 6px 14px;
+    border-bottom: 1.5px solid #e2e8f0;
+}
 
 /* --- LOGIN ---------------------------------------------------- */
 QWidget#login_bg {

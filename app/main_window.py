@@ -11,6 +11,8 @@ from app.windows.student import StudentWin
 from app.windows.program import ProgramWin
 from app.windows.college import CollegeWin
 
+from app.widgets.table import TablePage
+
 class MainWindow(QMainWindow):
     logout_requested = pyqtSignal()
 
@@ -218,8 +220,10 @@ class MainWindow(QMainWindow):
         if is_dash:
             self.dashboard_win.load()
         else:
-            QTimer.singleShot(0, lambda: 
-                              (self.current_table_win() or None) and self.current_table_win().refresh_columns())
+            view = self.current_table_win()
+            if view:
+                view.refresh_columns()
+                view.load()
 
     def on_search(self, q: str):
         self.last_search_query = q

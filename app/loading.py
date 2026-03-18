@@ -5,7 +5,7 @@ from PyQt5.QtCore    import Qt, QThread, pyqtSignal, QTimer
 class DBInitWorker(QThread):
     progress = pyqtSignal(int, str) 
     finished = pyqtSignal()
-    needed = 1000
+    needed = 50000
 
     def run(self):
         import random
@@ -17,44 +17,44 @@ class DBInitWorker(QThread):
         db_exists = os.path.exists(DB_PATH)  
         fake = Faker()
         with get_db() as conn:
-            self.progress.emit(15, "Creating tables…")
-            conn.executescript("""
-                CREATE TABLE IF NOT EXISTS college (
-                    code TEXT PRIMARY KEY,
-                    name TEXT NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS program (
-                    code    TEXT PRIMARY KEY,
-                    name    TEXT NOT NULL,
-                    college TEXT NOT NULL,
-                    FOREIGN KEY (college) REFERENCES college(code)
-                        ON UPDATE CASCADE ON DELETE RESTRICT
-                );
-                CREATE TABLE IF NOT EXISTS student (
-                    id        TEXT PRIMARY KEY,
-                    firstname TEXT NOT NULL,
-                    lastname  TEXT NOT NULL,
-                    course    TEXT NOT NULL,
-                    year      INTEGER NOT NULL CHECK(year BETWEEN 1 AND 4),
-                    gender    TEXT NOT NULL CHECK(gender IN ('Male','Female')),
-                    FOREIGN KEY (course) REFERENCES program(code)
-                        ON UPDATE CASCADE ON DELETE RESTRICT
-                );
-                CREATE INDEX IF NOT EXISTS idx_student_course ON student(course);
-                CREATE INDEX IF NOT EXISTS idx_student_name   ON student(lastname, firstname);
-                CREATE INDEX IF NOT EXISTS idx_program_college ON program(college);
-            """)
-
-            self.progress.emit(25, "Seeding colleges…")
-            conn.executemany("INSERT OR IGNORE INTO college(code,name) VALUES(?,?)", COLLEGES)
-
-            self.progress.emit(35, "Seeding programs…")
-            conn.executemany("INSERT OR IGNORE INTO program(code,name,college) VALUES(?,?,?)", PROGRAMS)
-
             if not db_exists:
-                from app.styles import COLORS_FILE
+                self.progress.emit(15, "Creating tables…")
+                conn.executescript("""
+                    CREATE TABLE IF NOT EXISTS college (
+                        code TEXT PRIMARY KEY,
+                        name TEXT NOT NULL
+                    );
+                    CREATE TABLE IF NOT EXISTS program (
+                        code    TEXT PRIMARY KEY,
+                        name    TEXT NOT NULL,
+                        college TEXT,
+                        FOREIGN KEY (college) REFERENCES college(code)
+                            ON UPDATE CASCADE ON DELETE SET NULL
+                    );
+                    CREATE TABLE IF NOT EXISTS student (
+                        id        TEXT PRIMARY KEY,
+                        firstname TEXT NOT NULL,
+                        lastname  TEXT NOT NULL,
+                        course    TEXT,
+                        year      INTEGER NOT NULL CHECK(year BETWEEN 1 AND 4),
+                        gender    TEXT NOT NULL CHECK(gender IN ('Male','Female')),
+                        FOREIGN KEY (course) REFERENCES program(code)
+                            ON UPDATE CASCADE ON DELETE SET NULL
+                    );
+                    CREATE INDEX IF NOT EXISTS idx_student_course ON student(course);
+                    CREATE INDEX IF NOT EXISTS idx_student_name   ON student(lastname, firstname);
+                    CREATE INDEX IF NOT EXISTS idx_program_college ON program(college);
+                """)
+
+                from app.widgets.badge import COLORS_FILE
                 if COLORS_FILE.exists():
                     COLORS_FILE.write_text("{}")  
+
+                self.progress.emit(25, "Seeding colleges…")
+                conn.executemany("INSERT OR IGNORE INTO college(code,name) VALUES(?,?)", COLLEGES)
+
+                self.progress.emit(35, "Seeding programs…")
+                conn.executemany("INSERT OR IGNORE INTO program(code,name,college) VALUES(?,?,?)", PROGRAMS)
                 
                 prog_codes = [p[0] for p in PROGRAMS]
                 genders = ["Male", "Female"]
@@ -191,7 +191,6 @@ class LoadingScreen(QWidget):
         QTimer.singleShot(100, self.ready.emit)
 
     def shutdown(self):
-
         if hasattr(self, "_worker") and self.worker.isRunning():
             self.worker.quit()
             self.worker.wait(2000)
