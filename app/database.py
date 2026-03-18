@@ -119,6 +119,10 @@ def college_delete(code: str):
 def get_college_codes() -> list:
     with get_db() as conn:
         return [r[0] for r in conn.execute("SELECT code FROM college ORDER BY code")]
+    
+def college_code_exists(code: str) -> bool:
+    with get_db() as conn:
+        return conn.execute("SELECT 1 FROM college WHERE code=?", (code,)).fetchone() is not None
 
 
 # --- PROGRAM ------------------------------------------------------------------
@@ -180,7 +184,7 @@ def get_program_codes() -> list:
     with get_db() as conn:
         return [r[0] for r in conn.execute("SELECT code FROM program ORDER BY code")]
     
-def code_exists(code: str) -> bool:
+def program_code_exists(code: str) -> bool:
     with get_db() as conn:
         return conn.execute("SELECT 1 FROM program WHERE code=?", (code,)).fetchone() is not None
 

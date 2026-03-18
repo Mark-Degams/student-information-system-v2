@@ -1,7 +1,8 @@
-"""
-styles.py
-Centralised Qt stylesheet and colour constants.
-"""
+import json
+from pathlib import Path
+
+COLORS_FILE = Path(__file__).resolve().parent / "data" / "badge_colors.json"
+DB_PATH = Path(__file__).resolve().parent.parent / "ssis.db"
 
 BADGE_COLORS: dict = {
     "CCS":  ("#d8fffd", "#018d86"),
@@ -12,6 +13,37 @@ BADGE_COLORS: dict = {
     "CHS":   ("#DDF3FF", "#016199"),
     "CSM":   ("#ffeaea", "#ff0000"),
 }
+
+def load_badge_colors() -> dict:
+    colors = dict(BADGE_COLORS)  
+    if COLORS_FILE.exists():
+        try:
+            colors.update(json.loads(COLORS_FILE.read_text()))
+        except Exception:
+            pass
+    return colors
+
+def save_badge_color(code: str, bg: str, fg: str):
+    COLORS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    colors = {}
+    if COLORS_FILE.exists():
+        try:
+            colors = json.loads(COLORS_FILE.read_text())
+        except Exception:
+            pass
+    colors[code] = (bg, fg)
+    COLORS_FILE.write_text(json.dumps(colors, indent=2))
+
+def delete_badge_color(code: str):
+    if not COLORS_FILE.exists():
+        return
+    try:
+        colors = json.loads(COLORS_FILE.read_text())
+        colors.pop(code, None)
+        COLORS_FILE.write_text(json.dumps(colors, indent=2))
+    except Exception:
+        pass
+
 
 APP_STYLE = """
 /* --- GLOBAL ---------------------------------------------------- */
@@ -236,6 +268,19 @@ QComboBox#mdl_combo QAbstractItemView {
     selection-background-color: #697d87; color: #2d3748;
 }
 QSpinBox#mdl_spin::up-button, QSpinBox#mdl_spin::down-button { width: 18px; }
+
+QFrame#section_box {
+    background: #ffffff;   
+    border: 1.5px solid #e2e8f0;   
+    border-radius: 7px;
+}
+QFrame#section_box:hover {
+    border-color: #4a6fa5;
+}
+QPushButton#color_btn {
+    border-radius:10px; 
+    border:1px solid #e2e8f0;
+}
 
 QPushButton#save_btn {
     background: #38a169; color: white; border: none;

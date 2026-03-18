@@ -1,12 +1,13 @@
 from PyQt5.QtWidgets import QLabel, QWidget, QHBoxLayout
 from PyQt5.QtCore import Qt
-from app.styles import BADGE_COLORS
+from app.styles import load_badge_colors
 
 
 def make_badge(text: str, college_code: str = None) -> QLabel:
     lbl = QLabel(text)
     lbl.setAlignment(Qt.AlignCenter)
-    bg, fg = BADGE_COLORS.get(college_code, ("#f0f0f0", "#4a5568"))
+    colors = load_badge_colors()
+    bg, fg = colors.get(college_code, ("#e2e8f0", "#4a5568"))
     lbl.setStyleSheet(
         f"background:{bg}; color:{fg}; border-radius:10px; "
         f"padding:2px 10px; font-size:11px; font-weight:700;"

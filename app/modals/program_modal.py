@@ -59,7 +59,7 @@ class ProgramModal(QWidget):
 
     def validate_and_save(self):
         code = self.inp_code.text().strip().upper()
-        if db.code_exists(code):
+        if db.program_code_exists(code):
             if self.edit_mode:
                 if code != self.orig_code:
                     QMessageBox.warning(self, "Validation", "Program code already exists.")

@@ -2,10 +2,12 @@ import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QApplication
 from PyQt5.QtCore    import Qt, QThread, pyqtSignal, QTimer
 
+from app.styles import COLORS_FILE
+
 class DBInitWorker(QThread):
     progress = pyqtSignal(int, str) 
     finished = pyqtSignal()
-    needed = 50000
+    needed = 1000
 
     def run(self):
         import random
@@ -14,7 +16,7 @@ class DBInitWorker(QThread):
         self.progress.emit(5,  "Connecting to database…")
 
         from app.database import get_db, COLLEGES, PROGRAMS, DB_PATH
-        db_exists = os.path.exists(DB_PATH)    
+        db_exists = os.path.exists(DB_PATH)  
         fake = Faker()
         with get_db() as conn:
             self.progress.emit(15, "Creating tables…")
@@ -52,6 +54,10 @@ class DBInitWorker(QThread):
             conn.executemany("INSERT OR IGNORE INTO program(code,name,college) VALUES(?,?,?)", PROGRAMS)
 
             if not db_exists:
+                from app.styles import COLORS_FILE
+                if COLORS_FILE.exists():
+                    COLORS_FILE.write_text("{}")  
+                
                 prog_codes = [p[0] for p in PROGRAMS]
                 genders = ["Male", "Female"]
                 used = {r[0] for r in conn.execute("SELECT id FROM student")}
