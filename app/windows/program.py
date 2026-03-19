@@ -42,6 +42,8 @@ class ProgramWin(TablePage):
         )
 
     def add_new(self):
+        if self.readonly:
+            return
         def on_save(code, name, college):
             try:
                 db.program_add(code, name, college)

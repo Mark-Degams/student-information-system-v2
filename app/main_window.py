@@ -223,11 +223,20 @@ class MainWindow(QMainWindow):
         self.lbl_name.setText(name)
         self.lbl_role.setText(role.capitalize())
 
-        restricted = role == "student"
-        for page_id in ("program", "college"):
-            self.nav_btns[page_id].setVisible(not restricted)
+        self.is_restricted = (role == "student")
 
-        self.navigate("dashboard")
+        self.add_btn.setVisible(not self.is_restricted)
+
+        for page_id in ("student", "dashboard"):
+            self.nav_btns[page_id].setVisible(not self.is_restricted)
+
+        self.program_win.set_readonly(self.is_restricted)
+        self.college_win.set_readonly(self.is_restricted)
+
+        if self.is_restricted:  
+            self.navigate("program")
+        else:
+            self.navigate("dashboard")
 
     def navigate(self, page_id: str):
         self.current_page = page_id
@@ -239,7 +248,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(idx_map[page_id])
 
         is_dash = (page_id == "dashboard")
-        self.add_btn.setVisible(not is_dash)
+        self.add_btn.setVisible(not is_dash and not self.is_restricted)
         self.search_wrap.setVisible(not is_dash)
         self.search_input.clear()
 

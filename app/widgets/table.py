@@ -19,6 +19,7 @@ class TablePage(QWidget):
         self.sort_asc = True
         self.q = ""
         self.field = "All Fields"
+        self.readonly = False
         self.build_ui()
 
     def build_ui(self):
@@ -153,6 +154,14 @@ class TablePage(QWidget):
                 if self.HEADERS[col] in exc_cols:
                     return True
         return super().eventFilter(obj, event)
+    
+    def set_readonly(self, readonly: bool):
+        self.readonly = readonly
+        actions_col = next(
+            (i for i, h in enumerate(self.HEADERS) if h == "Actions"), None
+        )
+        if actions_col is not None:
+            self.table.setColumnHidden(actions_col, readonly)
 
     def fetch(self, q, sort_key, asc, limit, offset, field="All Fields"):
         raise NotImplementedError

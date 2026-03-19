@@ -141,7 +141,7 @@ class LoginView(QWidget):
                     (username, password),
                 ).fetchone()
             if row:
-                name = f"{row['firstname']}.{row['lastname']}"
+                name = f"{row['firstname']} {row['lastname']}"
                 self.login_success.emit("student", name)
             else:
                 self.show_error("Student not found. Check your full name and ID number.")

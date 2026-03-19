@@ -45,6 +45,8 @@ class StudentWin(TablePage):
         )
 
     def add_new(self):
+        if self.readonly:
+            return
         def on_save(data):
             try:
                 db.student_add(*data)

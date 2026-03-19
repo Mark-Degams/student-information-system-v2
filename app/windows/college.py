@@ -42,6 +42,8 @@ class CollegeWin(TablePage):
         )
 
     def add_new(self):
+        if self.readonly:
+            return
         def on_save(code, name):
             try:
                 db.college_add(code, name)
