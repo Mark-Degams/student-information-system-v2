@@ -179,7 +179,7 @@ class MainWindow(QMainWindow):
         card_lay = QVBoxLayout(card); card_lay.setContentsMargins(0, 0, 0, 0); card_lay.setSpacing(0)
 
         self.stack = QStackedWidget()
-        self.dashboard_win = DashboardWin()
+        self.dashboard_win = DashboardWin(on_navigate=self.navigate_with_search)
         self.student_win = StudentWin()
         self.program_win = ProgramWin()
         self.college_win = CollegeWin()
@@ -224,6 +224,11 @@ class MainWindow(QMainWindow):
             if view:
                 view.refresh_columns()
                 view.load()
+        
+    def navigate_with_search(self, page_id, search_query=""):
+        self.navigate(page_id)
+        if search_query:
+            self.search_input.setText(search_query)
 
     def on_search(self, q: str):
         self.last_search_query = q

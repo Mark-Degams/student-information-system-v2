@@ -69,6 +69,10 @@ QFrame#card {
     border: 1px solid #e8e8d0;
     border-radius: 12px;
 }
+QFrame#stat_card:hover {
+    border: 1px solid #4a6fa5;
+    background: #f7fafc;
+}
 
 /* --- TOP BAR ---------------------------------------------------- */
 QWidget#search_wrap {

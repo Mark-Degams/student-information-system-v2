@@ -38,11 +38,12 @@ class TablePage(QWidget):
 
         header = self.table.horizontalHeader()
         header.setStretchLastSection(True)
-        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setSectionResizeMode(QHeaderView.Fixed)
         header.setSortIndicatorShown(True)
         header.setSortIndicator(self.sort_col, Qt.AscendingOrder)
         header.sectionClicked.connect(self.on_header_click)
         header.installEventFilter(self)
+        header.viewport().setCursor(Qt.PointingHandCursor)
 
         self.refresh_columns()
 
@@ -102,11 +103,13 @@ class TablePage(QWidget):
         edit_btn = QPushButton("Edit")
         edit_btn.setObjectName("edit_btn")
         edit_btn.setFixedHeight(28)
+        edit_btn.setCursor(Qt.PointingHandCursor)
         edit_btn.clicked.connect(on_edit)
 
         del_btn = QPushButton("Delete")
         del_btn.setObjectName("del_btn")
         del_btn.setFixedHeight(28)
+        del_btn.setCursor(Qt.PointingHandCursor)
         del_btn.clicked.connect(on_delete)
 
         lay.addWidget(edit_btn)
@@ -115,7 +118,8 @@ class TablePage(QWidget):
         self.table.setCellWidget(row, self.table.columnCount() - 1, w)
 
     def on_header_click(self, col_idx: int):
-        if self.HEADERS[col_idx] == "Actions":
+        exc_cols = ["Actions", "Students", "Programs"]
+        if self.HEADERS[col_idx] in exc_cols:
             order = Qt.AscendingOrder if self.sort_asc else Qt.DescendingOrder
             self.table.horizontalHeader().setSortIndicator(self.sort_col, order)
             return
@@ -138,6 +142,9 @@ class TablePage(QWidget):
 
     def eventFilter(self, obj, event):
         exc_cols = ["Actions", "Students", "Programs"]
+        if obj is self.table.horizontalHeader().viewport():
+            if event.type() == QEvent.MouseMove:
+                self.table.horizontalHeader().viewport().setCursor(Qt.PointingHandCursor)
         if obj is self.table.horizontalHeader() and event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease):
             col = obj.logicalIndexAt(event.pos())
             if col >= 0 and col < len(self.HEADERS):

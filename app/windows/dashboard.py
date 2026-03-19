@@ -9,12 +9,13 @@ import app.database as db
 
 
 class DashboardWin(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, on_navigate=None):
         super().__init__(parent)
-        self._build_ui()
+        self.on_navigate = on_navigate
+        self.build_ui()
         self.load()
 
-    def _build_ui(self):
+    def build_ui(self):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(20, 20, 20, 16)
         lay.setSpacing(18)
@@ -46,6 +47,12 @@ class DashboardWin(QWidget):
         row2.setSpacing(16)
         row2.addWidget(self.card_un_std)
         row2.addWidget(self.card_un_prog)
+
+        self.make_clickable(self.card_students, "student")
+        self.make_clickable(self.card_programs, "program")
+        self.make_clickable(self.card_colleges, "college")
+        self.make_clickable(self.card_un_std,  "student", "null")
+        self.make_clickable(self.card_un_prog, "program", "null")
 
         lay.addLayout(row1)
         lay.addLayout(row2)
@@ -142,3 +149,10 @@ class DashboardWin(QWidget):
                 item = QTableWidgetItem(str(val))
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 self.table.setItem(i, j, item)
+
+    def make_clickable(self, card, page_id, search_query=""):
+        card.setCursor(Qt.PointingHandCursor)
+        card.mousePressEvent = lambda e: (
+            self.on_navigate(page_id, search_query)
+            if self.on_navigate else None
+        )
