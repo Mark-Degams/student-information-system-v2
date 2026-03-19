@@ -51,7 +51,7 @@ class StudentModal(QWidget):
         ly = QLabel("YEAR LEVEL"); ly.setObjectName("mdl_lbl")
         lg = QLabel("GENDER");     lg.setObjectName("mdl_lbl")
         self.inp_year = QSpinBox(); self.inp_year.setObjectName("mdl_spin")
-        self.inp_year.setRange(1, 4); self.inp_year.setValue(year)
+        self.inp_year.setRange(1, 5); self.inp_year.setValue(year)
         self.inp_year.setSuffix("  ")
         self.inp_gender = QComboBox(); self.inp_gender.setObjectName("mdl_combo")
         self.inp_gender.addItems(["Male", "Female"])

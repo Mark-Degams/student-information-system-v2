@@ -28,8 +28,8 @@ class StudentWin(TablePage):
             self.overlay.close_overlay()
             self.overlay = None
 
-    def fetch(self, q, sort_key, asc, limit, offset):
-        return db.student_list(q, sort_key, asc, limit, offset)
+    def fetch(self, q, sort_key, asc, limit, offset, field="All Fields"):
+        return db.student_list(q, sort_key, asc, limit, offset, field)
 
     def populate_row(self, row_idx, rec):
         self.set_text(row_idx, 0, rec["id"])

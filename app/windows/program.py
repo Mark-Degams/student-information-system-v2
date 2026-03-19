@@ -27,7 +27,7 @@ class ProgramWin(TablePage):
             self.overlay.close_overlay()
             self.overlay = None
 
-    def fetch(self, q, sort_key, asc, limit, offset):
+    def fetch(self, q, sort_key, asc, limit, offset, field="All Fields"):
         return db.program_list(q, sort_key, asc, limit, offset)
 
     def populate_row(self, row_idx, rec):

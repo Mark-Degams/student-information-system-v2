@@ -14,10 +14,11 @@ class TablePage(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.page     = 1
+        self.page = 1
         self.sort_col = 0
         self.sort_asc = True
-        self.q        = ""
+        self.q = ""
+        self.field = "All Fields"
         self.build_ui()
 
     def build_ui(self):
@@ -68,15 +69,16 @@ class TablePage(QWidget):
         if getattr(self, "overlay", None):
             self.overlay.setGeometry(0, 0, self.width(), self.height())
 
-    def search(self, q: str):
-        self.q    = q
+    def search(self, q: str, field: str = "All Fields"):
+        self.q = q
+        self.field = field
         self.page = 1
         self.load()
 
     def load(self):
         sort_key = self.SORT_KEYS[min(self.sort_col, len(self.SORT_KEYS) - 1)]
         offset   = (self.page - 1) * PAGE_SIZE
-        rows, total = self.fetch(self.q, sort_key, self.sort_asc, PAGE_SIZE, offset)
+        rows, total = self.fetch(self.q, sort_key, self.sort_asc, PAGE_SIZE, offset, self.field)
 
         total_pages = max(1, -(-total // PAGE_SIZE))
 
@@ -152,7 +154,7 @@ class TablePage(QWidget):
                     return True
         return super().eventFilter(obj, event)
 
-    def fetch(self, q, sort_key, asc, limit, offset):
+    def fetch(self, q, sort_key, asc, limit, offset, field="All Fields"):
         raise NotImplementedError
 
     def populate_row(self, row_idx: int, record: dict):

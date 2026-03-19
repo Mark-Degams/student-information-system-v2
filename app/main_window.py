@@ -157,6 +157,7 @@ class MainWindow(QMainWindow):
         search_icon = QLabel()
         search_icon.setPixmap(QIcon(str(icon_path)).pixmap(16, 16))
         search_icon.setObjectName("search_icon")
+        search_icon.mousePressEvent = lambda e: self.search_input.setFocus()
 
         self.search_input = QLineEdit()
         self.search_input.focusInEvent = self.search_focus_in
@@ -168,11 +169,36 @@ class MainWindow(QMainWindow):
         sw.addWidget(search_icon)
         sw.addWidget(self.search_input)
 
+        self.filter_wrap = QWidget()
+        self.filter_wrap.setObjectName("search_wrap")
+        self.filter_wrap.setFixedHeight(42)
+        fw = QHBoxLayout(self.filter_wrap)
+        fw.setContentsMargins(12, 0, 12, 0)
+        fw.setSpacing(8)
+
+        self.field_combo = QComboBox()
+        self.field_combo.setObjectName("filter_combo")
+        self.field_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.field_combo.setFrame(False)
+        self.field_combo.currentTextChanged.connect(self.on_field_changed)
+
+        filter_icon_lbl = QLabel()
+        filter_icon_path = base / "icons" / "filter.svg"
+        filter_icon_lbl.setPixmap(QIcon(str(filter_icon_path)).pixmap(16, 16))
+        filter_icon_lbl.mousePressEvent = lambda e: self.field_combo.showPopup()
+
+        fw.addWidget(self.field_combo)
+        fw.addWidget(filter_icon_lbl)
+
+        self.filter_wrap.hide()
+
         self.add_btn = QPushButton("+  Add"); self.add_btn.setObjectName("add_btn")
         self.add_btn.setFixedHeight(42)
         self.add_btn.clicked.connect(self.on_add)
 
-        topbar.addWidget(self.search_wrap, 1); topbar.addWidget(self.add_btn)
+        topbar.addWidget(self.search_wrap, 1)
+        topbar.addWidget(self.filter_wrap)
+        topbar.addWidget(self.add_btn)
         lay.addLayout(topbar)
 
         card = QFrame(); card.setObjectName("card")
@@ -217,6 +243,16 @@ class MainWindow(QMainWindow):
         self.search_wrap.setVisible(not is_dash)
         self.search_input.clear()
 
+        field_pages = {"student": ["All Fields", "ID", "First Name", "Last Name", "Course"]}
+        if page_id in field_pages:
+            self.field_combo.blockSignals(True)
+            self.field_combo.clear()
+            self.field_combo.addItems(field_pages[page_id])
+            self.field_combo.blockSignals(False)
+            self.filter_wrap.show()
+        else:
+            self.filter_wrap.hide()
+
         if is_dash:
             self.dashboard_win.load()
         else:
@@ -237,7 +273,11 @@ class MainWindow(QMainWindow):
     def perform_search(self):
         view = self.current_table_win()
         if view:
-            view.search(getattr(self, "last_search_query", ""))
+            field = self.field_combo.currentText() if self.filter_wrap.isVisible() else "All Fields"
+            view.search(getattr(self, "last_search_query", ""), field)
+        
+    def on_field_changed(self):
+        self.perform_search()
 
     def on_add(self):
         view = self.current_table_win()

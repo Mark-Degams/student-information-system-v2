@@ -208,7 +208,7 @@ def programs_by_college(college_code: str) -> list:
 
 # --- STUDENT ------------------------------------------------------------------
 
-def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0):
+def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="All Fields"):
     col_map = {
         "id":        "s.id",
         "firstname": "s.firstname",
@@ -220,7 +220,7 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0):
     order = f"{col_map.get(sort_col, 's.id')} {'ASC' if sort_asc else 'DESC'}"
     like  = f"%{q}%"
     with get_db() as conn:
-        null_search = q.strip().lower() in ("null", "none", "n/a", "unenrolled")
+        null_search = q.strip().lower() in ("null", "none", "no course", "unenrolled")
         if null_search:
             rows = conn.execute(
                 f"SELECT s.id, s.firstname, s.lastname, s.course, s.year, s.gender, "
@@ -234,18 +234,46 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0):
                 "SELECT COUNT(*) FROM student WHERE course IS NULL"
             ).fetchone()[0]
         else:
+            field_map = {
+                "ID":         ["s.id"],
+                "First Name": ["s.firstname"],
+                "Last Name":  ["s.lastname"],
+                "Course":     ["s.course"],
+            }
+            search_cols = field_map.get(field, ["s.id", "s.firstname", "s.lastname", "s.course"])
+            
+            terms = [t.strip() for t in q.split(" ") if t.strip()]
+            if not terms:
+                terms = [""]
+
+            year_terms = [t for t in terms if t.isdigit() and 1 <= int(t) <= 5]
+            other_terms = [t for t in terms if not (t.isdigit() and 1 <= int(t) <= 5)]
+
+            term_conditions = []
+            params = []
+            for term in other_terms:
+                col_conditions = " OR ".join(f"{c} LIKE ?" for c in search_cols)
+                term_conditions.append(f"({col_conditions})")
+                params.extend([f"%{term}%"] * len(search_cols))
+
+            if year_terms:
+                year_placeholders = ",".join("?" * len(year_terms))
+                term_conditions.append(f"s.year IN ({year_placeholders})")
+                params.extend([int(t) for t in year_terms])
+
+            where = " AND ".join(term_conditions) if term_conditions else "1=1"
+
             rows = conn.execute(
                 f"SELECT s.id, s.firstname, s.lastname, s.course, s.year, s.gender, "
                 f"p.name AS program_name, p.college AS college_code "
                 f"FROM student s LEFT JOIN program p ON p.code=s.course "
-                f"WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ? "
+                f"WHERE {where} "
                 f"ORDER BY {order} LIMIT ? OFFSET ?",
-                (like, like, like, like, limit, offset),
+                (*params, limit, offset),
             ).fetchall()
             total = conn.execute(
-                "SELECT COUNT(*) FROM student s "
-                "WHERE s.id LIKE ? OR s.firstname LIKE ? OR s.lastname LIKE ? OR s.course LIKE ?",
-                (like, like, like, like),
+                f"SELECT COUNT(*) FROM student s WHERE {where}",
+                params,
             ).fetchone()[0]
     return [dict(r) for r in rows], total
 

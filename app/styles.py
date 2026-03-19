@@ -97,6 +97,52 @@ QLineEdit#search_box {
 QLineEdit#search_box:focus {
     background: transparent;
 }
+QComboBox#filter_combo {
+    background: transparent;
+    border: none;
+    padding: 0px;
+    font-size: 14px;
+    color: #2d3748;
+    min-width: 70px;
+}
+QComboBox#filter_combo:hover {
+    background: transparent;
+}
+QComboBox#filter_combo:focus {
+    border: none;
+    outline: none;
+}
+QComboBox#filter_combo::drop-down {
+    width: 18px;
+    border: none;
+    background: transparent;
+}
+QComboBox#filter_combo::down-arrow {
+    image: none;
+}
+QComboBox#filter_combo QAbstractItemView {
+    background: white;
+    border: none;
+    color: #2d3748;
+    padding: 6px;
+    outline: 0;
+    font-size: 13px;
+    selection-background-color: #697d87;
+    selection-color: white;
+}
+QComboBox#filter_combo QAbstractItemView::item {
+    padding: 8px 14px;
+    border-radius: 6px;
+    min-height: 20px;
+}
+QComboBox#filter_combo QAbstractItemView::item:selected {
+    background: #697d87;
+    color: white;
+}
+QComboBox#filter_combo QAbstractItemView::item:hover {
+    background: #697d87;
+    color: white;
+}
 QPushButton#add_btn {
     background: #38a169;
     color: white;
