@@ -13,9 +13,10 @@ class CollegeWin(TablePage):
     FIXED_WIDTHS = {0: 130, 2: 100, 3: 150}
     FLEX_RATIOS = {1: 1} 
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, show_notify=None):
         super().__init__(parent)
         self.overlay = None
+        self.show_notify = show_notify
         self.load()
 
     def open_modal(self, modal_widget: CollegeModal):
@@ -49,6 +50,7 @@ class CollegeWin(TablePage):
                 db.college_add(code, name)
                 self.close_modal()
                 self.load()
+                self.show_notify(f"College '<b>{code}</b>' added successfully.", "success")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
@@ -61,6 +63,7 @@ class CollegeWin(TablePage):
                 db.college_update(rec["code"], code, name)
                 self.close_modal()
                 self.load()
+                self.show_notify(f"College '<b>{code}</b>' edited successfully.", "edit")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
@@ -81,6 +84,7 @@ class CollegeWin(TablePage):
                 delete_badge_color(rec["code"])
                 self.close_modal()
                 self.load()
+                self.show_notify(f"Program '<b>{rec['code']}</b>' deleted successfully.", "delete")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 

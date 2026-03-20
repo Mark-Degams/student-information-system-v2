@@ -4,8 +4,9 @@ from PyQt5.QtGui import QPixmap, QPainter, QColor, QIcon
 from PyQt5.QtSvg import QSvgRenderer
 
 from pathlib import Path
-from app.styles import APP_STYLE
 
+from app.styles import APP_STYLE
+from app.widgets.notification import Notify
 from app.windows.dashboard import DashboardWin
 from app.windows.student import StudentWin
 from app.windows.program import ProgramWin
@@ -200,9 +201,9 @@ class MainWindow(QMainWindow):
 
         self.stack = QStackedWidget()
         self.dashboard_win = DashboardWin(on_navigate=self.navigate_with_search)
-        self.student_win = StudentWin()
-        self.program_win = ProgramWin()
-        self.college_win = CollegeWin()
+        self.student_win = StudentWin(show_notify=self.show_notify)
+        self.program_win = ProgramWin(show_notify=self.show_notify)
+        self.college_win = CollegeWin(show_notify=self.show_notify)
 
         self.stack.addWidget(self.dashboard_win)
         self.stack.addWidget(self.student_win)  
@@ -291,3 +292,6 @@ class MainWindow(QMainWindow):
             "program": self.program_win,
             "college": self.college_win,
         }.get(self.current_page)
+
+    def show_notify(self, message: str, kind="success"):
+        Notify(self, message, kind)

@@ -13,9 +13,10 @@ class StudentWin(TablePage):
     FIXED_WIDTHS = {0: 110, 3: 150, 4: 70, 5: 85, 6: 150}
     FLEX_RATIOS = {1: 0.55, 2: 0.45} 
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, show_notify=None):
         super().__init__(parent)
         self.overlay = None
+        self.show_notify = show_notify
         self.load()
 
     def open_modal(self, modal_widget: StudentModal):
@@ -52,6 +53,7 @@ class StudentWin(TablePage):
                 db.student_add(*data)
                 self.close_modal()
                 self.load()
+                self.show_notify(f"Student '<b>{data[0]}</b>' added successfully.", "success")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
@@ -66,6 +68,7 @@ class StudentWin(TablePage):
                 db.student_update(*data)
                 self.close_modal()
                 self.load()
+                self.show_notify(f"Student '<b>{rec['id']}</b>' edited successfully.", "edit")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
@@ -82,6 +85,7 @@ class StudentWin(TablePage):
                 db.student_delete(rec["id"])
                 self.close_modal()
                 self.load()
+                self.show_notify(f"Student '<b>{rec['id']}</b>' deleted successfully.", "delete")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
