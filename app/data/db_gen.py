@@ -6,12 +6,13 @@ from faker import Faker
 class DBGenerator(QThread):
     progress = pyqtSignal(int, str)
     finished = pyqtSignal()
-    needed = 5000
+    needed = 50000
 
     def run(self):
         self.progress.emit(5, "Connecting to database…")
 
-        from app.database import get_db, COLLEGES, PROGRAMS, DB_PATH
+        from app.database import get_db, DB_PATH
+        from app.data.preset_data import COLLEGES, PROGRAMS
         from app.widgets.badge import COLORS_FILE
 
         db_exists = os.path.exists(DB_PATH)

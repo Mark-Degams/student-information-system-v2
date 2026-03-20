@@ -1,7 +1,6 @@
-import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer
-from app.db_gen import DBGenerator
+from app.data.db_gen import DBGenerator
 
 class LoadingScreen(QWidget):
     ready = pyqtSignal() 

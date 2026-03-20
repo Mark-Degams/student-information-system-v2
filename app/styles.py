@@ -22,9 +22,9 @@ QWidget#sidebar {
 }
 QLabel#brand {
     color: #ffffff;
-    font-size: 22px;
+    font-size: 40px;
     font-weight: bold;
-    padding: 18px 20px 6px 20px;
+    padding: 18px 20px 6px 10px;
 }
 QWidget#user_card {
     background: rgba(255,255,255,0.09);

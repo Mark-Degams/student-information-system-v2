@@ -11,14 +11,15 @@ from app.windows.student import StudentWin
 from app.windows.program import ProgramWin
 from app.windows.college import CollegeWin
 
-from app.widgets.table import TablePage
-
 class MainWindow(QMainWindow):
+    base = Path(__file__).resolve().parent.parent
     logout_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("SSIS - Student Information System")
+        print(self.base / "icons" / "logo.png")
+        self.setWindowIcon(QIcon(QPixmap(str(self.base/"icons"/"logo.png"))))
         self.setMinimumSize(1100, 680)
         self.resize(1100, 800)
         self.setStyleSheet(APP_STYLE)
@@ -53,14 +54,12 @@ class MainWindow(QMainWindow):
             painter.end()
 
             return QIcon(pixmap)
-        
-        base = Path(__file__).resolve().parent
 
         NAV_ITEMS = [
-            ("dashboard", colored_svg_icon(base/"icons/dashboard.svg", "white"), "Dashboard"),
-            ("student",   colored_svg_icon(base/"icons/person.svg", "white"), "Student"),
-            ("program",   colored_svg_icon(base/"icons/program.svg", "white"), "Program"),
-            ("college",   colored_svg_icon(base/"icons/college.svg", "white"), "College"),
+            ("dashboard", colored_svg_icon(self.base/"icons/dashboard.svg", "white"), "Dashboard"),
+            ("student",   colored_svg_icon(self.base/"icons/person.svg", "white"), "Student"),
+            ("program",   colored_svg_icon(self.base/"icons/program.svg", "white"), "Program"),
+            ("college",   colored_svg_icon(self.base/"icons/college.svg", "white"), "College"),
         ]
 
         sidebar = QWidget()
@@ -116,7 +115,7 @@ class MainWindow(QMainWindow):
         logout_btn = QPushButton("Logout")
         logout_btn.setObjectName("logout_btn")
         logout_btn.setFixedHeight(48)
-        logout_btn.setIcon(colored_svg_icon(base/"icons/logout.svg", "#fc8181"))
+        logout_btn.setIcon(colored_svg_icon(self.base/"icons/logout.svg", "#fc8181"))
         logout_btn.setIconSize(QSize(20, 20))
 
         logout_btn.clicked.connect(self.logout_requested.emit)
@@ -151,11 +150,8 @@ class MainWindow(QMainWindow):
         sw.setContentsMargins(12, 0, 12, 0)
         sw.setSpacing(8)
 
-        base = Path(__file__).resolve().parent
-        icon_path = base / "icons" / "search.svg"
-
         search_icon = QLabel()
-        search_icon.setPixmap(QIcon(str(icon_path)).pixmap(16, 16))
+        search_icon.setPixmap(QIcon(str(self.base/"icons"/"search.svg")).pixmap(16, 16))
         search_icon.setObjectName("search_icon")
         search_icon.mousePressEvent = lambda e: self.search_input.setFocus()
 
@@ -183,8 +179,7 @@ class MainWindow(QMainWindow):
         self.field_combo.currentTextChanged.connect(self.on_field_changed)
 
         filter_icon_lbl = QLabel()
-        filter_icon_path = base / "icons" / "filter.svg"
-        filter_icon_lbl.setPixmap(QIcon(str(filter_icon_path)).pixmap(16, 16))
+        filter_icon_lbl.setPixmap(QIcon(str(self.base/"icons"/"filter.svg")).pixmap(16, 16))
         filter_icon_lbl.mousePressEvent = lambda e: self.field_combo.showPopup()
 
         fw.addWidget(self.field_combo)
@@ -265,11 +260,8 @@ class MainWindow(QMainWindow):
         if is_dash:
             self.dashboard_win.load()
         else:
-            view = self.current_table_win()
-            if view:
-                view.refresh_columns()
-                view.load()
-        
+            self.perform_search()
+
     def navigate_with_search(self, page_id, search_query=""):
         self.navigate(page_id)
         if search_query:

@@ -1,75 +1,10 @@
 import sqlite3
-import random
 import os
 from faker import Faker
 
 fake = Faker()
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ssis.db")
-
-COLLEGES = [
-    ("CCS",  "College of Computer Studies"),
-    ("CED",  "College of Education"),
-    ("COE",  "College of Engineering"),
-    ("CBAA",  "College of Business Administration and Accountancy"),
-    ("CHS",  "College of Health Sciences"),
-    ("CASS", "College of Arts and Social Sciences"),
-    ("CSM",  "College of Science and Mathematics"),
-]
-
-PROGRAMS = [
-    ("BAELS", "Bachelor of Arts in English Language Studies", "CASS"),
-    ("BAFil", "Bachelor of Arts in Filipino", "CASS"),
-    ("BAHis", "Bachelor of Arts in History", "CASS"),
-    ("BALCS", "Bachelor of Arts in Literature and Cultural Studies", "CASS"),
-    ("BAPan", "Bachelor of Arts in Panitikan", "CASS"),
-    ("BAPols", "Bachelor of Arts in Political Science", "CASS"),
-    ("BAPsych", "Bachelor of Arts in Psychology", "CASS"),
-    ("BASoc", "Bachelor of Arts in Sociology", "CASS"),
-    ("BSPhilo", "Bachelor of Science in Philosophy Major in Applied Ethics", "CASS"),
-    ("BSPsych", "Bachelor of Science in Psychology", "CASS"),
-    ("BSA", "Bachelor of Science in Accountancy", "CBAA"),
-    ("BSBA-BE", "Bachelor of Science in Business Administration (Business Economics)", "CBAA"),
-    ("BSBA-EM", "Bachelor of Science in Business Administration (Entrepreneurial Marketing)", "CBAA"),
-    ("BSBA-Econ", "Bachelor of Science in Business Administration (Economics)", "CBAA"),
-    ("BSHRM", "Bachelor of Science in Hotel and Restaurant Management", "CBAA"),
-    ("BSCA", "Bachelor of Science in Computer Application", "CCS"),
-    ("BSCS", "Bachelor of Science in Computer Science", "CCS"),
-    ("BSIS", "Bachelor of Science in Information Systems", "CCS"),
-    ("BSIT", "Bachelor of Science in Information Technology", "CCS"),
-    ("BEED-Eng", "Bachelor of Elementary Education (English)", "CED"),
-    ("BEED-SH", "Bachelor of Elementary Education (Science and Health)", "CED"),
-    ("BSED-Bio", "Bachelor of Secondary Education (Biology)", "CED"),
-    ("BSED-Chem", "Bachelor of Secondary Education (Chemistry)", "CED"),
-    ("BSED-GenSci", "Bachelor of Secondary Education (General Science)", "CED"),
-    ("BSED-Mapeh", "Bachelor of Secondary Education (MAPEH)", "CED"),
-    ("BSED-Math", "Bachelor of Secondary Education (Mathematics)", "CED"),
-    ("BSED-Phys", "Bachelor of Secondary Education (Physics)", "CED"),
-    ("BSED-TLE", "Bachelor of Secondary Education (TLE)", "CED"),
-    ("BSIE-Draft", "Bachelor of Science in Industrial Education (Drafting)", "CED"),
-    ("BSTTE-DT", "Bachelor of Science in Technology Teacher Education (Drafting Tech)", "CED"),
-    ("BSTTE-IT", "Bachelor of Science in Technology Teacher Education (Industrial Tech)", "CED"),
-    ("BSCE", "Bachelor of Science in Civil Engineering", "COE"),
-    ("BSCerE", "Bachelor of Science in Ceramics Engineering", "COE"),
-    ("BSChE", "Bachelor of Science in Chemical Engineering", "COE"),
-    ("BSCpE", "Bachelor of Science in Computer Engineering", "COE"),
-    ("BSEE", "Bachelor of Science in Electrical Engineering", "COE"),
-    ("BSEcE", "Bachelor of Science in Electronics & Communications Engineering", "COE"),
-    ("BSEnE", "Bachelor of Science in Environmental Engineering", "COE"),
-    ("BSME", "Bachelor of Science in Mechanical Engineering", "COE"),
-    ("BSMetE", "Bachelor of Science in Metallurgical Engineering", "COE"),
-    ("BSMinE", "Bachelor of Science in Mining Engineering", "COE"),
-    ("BSN", "Bachelor of Science in Nursing", "CHS"),
-    ("BSBio-Bot", "Bachelor of Science in Biology (Botany)", "CSM"),
-    ("BSBio-Gen", "Bachelor of Science in Biology (General)", "CSM"),
-    ("BSBio-Mar", "Bachelor of Science in Biology (Marine)", "CSM"),
-    ("BSBio-Zoo", "Bachelor of Science in Biology (Zoology)", "CSM"),
-    ("BSChem", "Bachelor of Science in Chemistry", "CSM"),
-    ("BSMath", "Bachelor of Science in Mathematics", "CSM"),
-    ("BSPhys", "Bachelor of Science in Physics", "CSM"),
-    ("BSStat", "Bachelor of Science in Statistics", "CSM"),
-]
-
 
 def get_db() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
@@ -103,6 +38,7 @@ def get_dashboard_stats() -> dict:
 
 # --- COLLEGE ------------------------------------------------------------------
 
+
 def college_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     col_map = {"code": "c.code", "name": "c.name", "programs": "programs"}
     order   = f"{col_map.get(sort_col, 'c.code')} {'ASC' if sort_asc else 'DESC'}"
@@ -125,7 +61,6 @@ def college_add(code: str, name: str):
     with get_db() as conn:
         conn.execute("INSERT INTO college(code,name) VALUES(?,?)", (code.upper(), name))
         conn.commit()
-
 
 def college_update(old_code: str, code: str, name: str):
     with get_db() as conn:
@@ -230,6 +165,7 @@ def programs_by_college(college_code: str) -> list:
 
 
 # --- STUDENT ------------------------------------------------------------------
+
 
 def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="All Fields"):
     col_map = {
