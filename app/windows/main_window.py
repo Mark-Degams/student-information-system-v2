@@ -18,7 +18,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("SSIS - Student Information System")
-        print(self.base / "icons" / "logo.png")
         self.setWindowIcon(QIcon(QPixmap(str(self.base/"icons"/"logo.png"))))
         self.setMinimumSize(1100, 680)
         self.resize(1100, 800)

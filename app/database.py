@@ -41,7 +41,7 @@ def get_dashboard_stats() -> dict:
 
 def college_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     col_map = {"code": "c.code", "name": "c.name", "programs": "programs"}
-    order   = f"{col_map.get(sort_col, 'c.code')} {'ASC' if sort_asc else 'DESC'}"
+    order = f"{col_map.get(sort_col, 'c.code')} {'ASC' if sort_asc else 'DESC'}, c.code ASC"
     like    = f"%{q}%"
     with get_db() as conn:
         rows  = conn.execute(
@@ -92,7 +92,7 @@ def program_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
         "college_name": "c.name",
         "students":     "students",
     }
-    order = f"{col_map.get(sort_col, 'p.code')} {'ASC' if sort_asc else 'DESC'}"
+    order = f"{col_map.get(sort_col, 'p.code')} {'ASC' if sort_asc else 'DESC'}, p.code ASC"
     like  = f"%{q}%"
     with get_db() as conn:
         null_search = q.strip().lower() in ("null", "none", "n/a", "unassigned")
@@ -176,8 +176,8 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="
         "year":      "s.year",
         "gender":    "s.gender",
     }
-    order = f"{col_map.get(sort_col, 's.id')} {'ASC' if sort_asc else 'DESC'}"
-    like  = f"%{q}%"
+    primary = col_map.get(sort_col, 's.id')
+    order = f"{primary} {'ASC' if sort_asc else 'DESC'}, s.id ASC"
     with get_db() as conn:
         null_search = q.strip().lower() in ("null", "none", "no course", "unenrolled")
         if null_search:
