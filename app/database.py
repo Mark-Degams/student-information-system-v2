@@ -210,15 +210,22 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="
                 "First Name": ["s.firstname"],
                 "Last Name":  ["s.lastname"],
                 "Course":     ["s.course"],
+                "College":    ["p.college"],
             }
-            search_cols = field_map.get(field, ["s.id", "s.firstname", "s.lastname", "s.course"])
+            search_cols = field_map.get(field, ["s.id", "s.firstname", "s.lastname", "s.course", "p.college"])
             
             terms = [t.strip() for t in q.split(" ") if t.strip()]
             if not terms:
                 terms = [""]
 
-            year_terms = [t for t in terms if t.isdigit() and 1 <= int(t) <= 5]
-            other_terms = [t for t in terms if not (t.isdigit() and 1 <= int(t) <= 5)]
+            college_codes = {c.lower() for c in get_college_codes()}
+            year_terms    = [t for t in terms if t.isdigit() and 1 <= int(t) <= 5]
+            college_terms = [t for t in terms if t.lower() in college_codes]
+            other_terms   = [t for t in terms if not (t.isdigit() and 1 <= int(t) <= 5) and t.lower() not in college_codes]
+
+            if len(college_terms) > 1:
+                other_terms = other_terms + college_terms[1:]
+                college_terms = college_terms[:1]
 
             term_conditions = []
             params = []
@@ -232,6 +239,10 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="
                 term_conditions.append(f"s.year IN ({year_placeholders})")
                 params.extend([int(t) for t in year_terms])
 
+            if college_terms:
+                term_conditions.append(f"UPPER(p.college) = ?")
+                params.append(college_terms[0].upper())
+
             where = " AND ".join(term_conditions) if term_conditions else "1=1"
 
             rows = conn.execute(
@@ -243,7 +254,9 @@ def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="
                 (*params, limit, offset),
             ).fetchall()
             total = conn.execute(
-                f"SELECT COUNT(*) FROM student s WHERE {where}",
+                f"SELECT COUNT(*) FROM student s "
+                f"LEFT JOIN program p ON p.code=s.course "
+                f"WHERE {where}",
                 params,
             ).fetchone()[0]
     return [dict(r) for r in rows], total

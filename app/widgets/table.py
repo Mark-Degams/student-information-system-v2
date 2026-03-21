@@ -20,6 +20,7 @@ class TablePage(QWidget):
         self.q = ""
         self.field = "All Fields"
         self.readonly = False
+        self.current_rows = []
         self.build_ui()
 
     def build_ui(self):
@@ -32,6 +33,9 @@ class TablePage(QWidget):
         self.table.setHorizontalHeaderLabels(self.HEADERS)
         self.table.setAlternatingRowColors(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self.on_context_menu)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setShowGrid(False)
         self.table.setFrameShape(QFrame.NoFrame)
@@ -86,6 +90,7 @@ class TablePage(QWidget):
 
         total_pages = max(1, -(-total // PAGE_SIZE))
 
+        self.current_rows = rows
         self.table.setRowCount(len(rows))
         for i, record in enumerate(rows):
             self.populate_row(i, record)
@@ -165,6 +170,13 @@ class TablePage(QWidget):
         )
         if actions_col is not None:
             self.table.setColumnHidden(actions_col, readonly)
+
+    def get_selected_records(self):
+        rows = set(idx.row() for idx in self.table.selectedIndexes())
+        return [self.current_rows[r] for r in sorted(rows) if r < len(self.current_rows)]
+
+    def on_context_menu(self, pos):
+        pass
 
     def fetch(self, q, sort_key, asc, limit, offset, field="All Fields"):
         raise NotImplementedError

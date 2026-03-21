@@ -209,6 +209,10 @@ QPushButton#del_btn {
 }
 QPushButton#del_btn:hover { background: #fed7d7; }
 
+QMenu#group_select_menu { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px; }
+QMenu#group_select_menu::item { padding: 8px 20px; border-radius: 6px; font-size: 13px; color: #2d3748; }
+QMenu#group_select_menu::item:selected { background: #edf2f7; }
+
 QScrollBar:vertical { width: 6px; background: transparent; border: none; }
 QScrollBar::handle:vertical { background: #cbd5e0; border-radius: 3px; min-height: 30px; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }

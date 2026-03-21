@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QMenu, QAction
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
+from app.widgets.group_modal import GroupEditModal
 from app.modals.program_modal import ProgramModal
 from app.modals.delete_modal import DeleteModal
 import app.database as db
@@ -41,6 +42,54 @@ class ProgramWin(TablePage):
             on_edit=lambda _, r=rec: self.edit(r),
             on_delete=lambda _, r=rec: self.delete(r),
         )
+
+    def on_context_menu(self, pos):
+        if self.readonly:
+            return
+        selected = self.get_selected_records()
+        if len(selected) < 2:
+            return
+
+        menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px; }
+            QMenu::item { padding: 8px 20px; border-radius: 6px; font-size: 13px; color: #2d3748; }
+            QMenu::item:selected { background: #edf2f7; }
+        """)
+        edit_action = QAction(f"Group Edit ({len(selected)} programs)", self)
+        edit_action.triggered.connect(lambda: self.group_edit(selected))
+        menu.addAction(edit_action)
+        menu.exec_(self.table.viewport().mapToGlobal(pos))
+
+    def group_edit(self, selected):
+        rows = [[r["code"], r["name"], r["college"] or "N/A"] for r in selected]
+        colleges = db.get_college_codes()
+
+        def on_confirm(values):
+            try:
+                new_college = values["college"]
+                for rec in selected:
+                    db.program_update(rec["code"], rec["code"], rec["name"], new_college)
+                self.close_modal()
+                self.load()
+                self.show_notify(f"<b>{len(selected)}</b> programs updated successfully.", "edit")
+            except Exception as e:
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.critical(self, "Error", str(e))
+
+        mdl = GroupEditModal(
+            self,
+            title="Group Edit Programs",
+            record_headers=["Code", "Name", "College"],
+            record_rows=rows,
+            fields=[
+                {"key": "college", "label": "NEW COLLEGE", "type": "combo",
+                "items": colleges, "current": ""},
+            ],
+            on_confirm=on_confirm,
+            on_cancel=self.close_modal,
+        )
+        self.open_modal(mdl)
 
     def add_new(self):
         if self.readonly:

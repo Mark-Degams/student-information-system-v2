@@ -247,7 +247,7 @@ class MainWindow(QMainWindow):
         self.search_wrap.setVisible(not is_dash)
         self.search_input.clear()
 
-        field_pages = {"student": ["All Fields", "ID", "First Name", "Last Name", "Course"]}
+        field_pages = {"student": ["All Fields", "ID", "First Name", "Last Name", "Course", "College"]}
         if page_id in field_pages:
             self.field_combo.blockSignals(True)
             self.field_combo.clear()
