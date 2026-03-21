@@ -271,7 +271,7 @@ def student_delete(sid: str):
 
 def student_id_exist(sid: str) -> bool:
     with get_db() as conn:
-        return conn.execute("SELECT 1 FROM student WHERE id=?", (sid,)).fetchone is not None
+        return conn.execute("SELECT 1 FROM student WHERE id=?", (sid,)).fetchone() is not None
 
 def validate_student_id(sid: str) -> bool:
     import re

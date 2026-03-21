@@ -61,7 +61,7 @@ def validate_student_id(sid, edit_mode=False):
         return None, None
     if not db.validate_student_id(sid):
         return "error", "ID must be in YYYY-NNNN format (e.g. 2024-0001)."
-    if db.student_id_exist(sid) and not edit_mode:
+    if db.student_id_exist(sid):
         return "error", "Student ID already exists."
     return "valid", ""
 
