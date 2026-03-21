@@ -269,6 +269,10 @@ def student_delete(sid: str):
         conn.execute("DELETE FROM student WHERE id=?", (sid,))
         conn.commit()
 
+def student_id_exist(sid: str) -> bool:
+    with get_db() as conn:
+        return conn.execute("SELECT 1 FROM student WHERE id=?", (sid,)).fetchone is not None
+
 def validate_student_id(sid: str) -> bool:
     import re
     return bool(re.match(r"^\d{4}-\d{4}$", sid))
