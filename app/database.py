@@ -38,7 +38,6 @@ def get_dashboard_stats() -> dict:
 
 # --- COLLEGE ------------------------------------------------------------------
 
-
 def college_list(q="", sort_col="code", sort_asc=True, limit=50, offset=0):
     col_map = {"code": "c.code", "name": "c.name", "programs": "programs"}
     order = f"{col_map.get(sort_col, 'c.code')} {'ASC' if sort_asc else 'DESC'}, c.code ASC"
@@ -163,9 +162,22 @@ def programs_by_college(college_code: str) -> list:
         ).fetchall()
     return [dict(r) for r in rows]
 
+def get_program_codes_by_college(college: str) -> list:
+    with get_db() as conn:
+        return [r[0] for r in conn.execute(
+            "SELECT code FROM program WHERE college=? ORDER BY code",
+            (college,)
+        )]
+
+def get_programs_with_college() -> list:
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT code, college FROM program ORDER BY code"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
 
 # --- STUDENT ------------------------------------------------------------------
-
 
 def student_list(q="", sort_col="id", sort_asc=True, limit=50, offset=0, field="All Fields"):
     col_map = {

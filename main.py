@@ -31,7 +31,7 @@ class AppShell(QStackedWidget):
         self.main_win.logout_requested.connect(self.on_logout)
 
         self.setCurrentIndex(0)
-        # self.login_view.login_success.emit("admin", "Administrator") # Auto-login for testing
+        self.login_view.login_success.emit("admin", "Administrator") # Auto-login for testing
 
     def on_login(self, role: str, name: str):
         self.main_win.set_user(role, name)

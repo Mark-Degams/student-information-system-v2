@@ -47,13 +47,12 @@ class TablePage(QWidget):
         header.installEventFilter(self)
         header.viewport().setCursor(Qt.PointingHandCursor)
 
-        self.refresh_columns()
-
         self.pagination = PaginationBar()
         self.pagination.page_changed.connect(self.go_page)
 
         root.addWidget(self.table, 1)
         root.addWidget(self.pagination)
+        self.refresh_columns()
 
     def refresh_columns(self):
         for col, w in self.FIXED_WIDTHS.items():
@@ -69,6 +68,10 @@ class TablePage(QWidget):
         self.refresh_columns()
         if getattr(self, "overlay", None):
             self.overlay.setGeometry(0, 0, self.width(), self.height())
+
+    def showEvent(self, event):   
+        super().showEvent(event)
+        self.refresh_columns()
 
     def search(self, q: str, field: str = "All Fields"):
         self.q = q

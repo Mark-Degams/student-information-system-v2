@@ -50,7 +50,7 @@ class CollegeWin(TablePage):
                 db.college_add(code, name)
                 self.close_modal()
                 self.load()
-                self.show_notify(f"College '<b>{code}</b>' added successfully.", "success")
+                self.show_notify(f"College '<b>{code.upper()}</b>' added successfully.", "success")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 
@@ -63,7 +63,7 @@ class CollegeWin(TablePage):
                 db.college_update(rec["code"], code, name)
                 self.close_modal()
                 self.load()
-                self.show_notify(f"College '<b>{code}</b>' edited successfully.", "edit")
+                self.show_notify(f"College '<b>{code.upper()}</b>' edited successfully.", "edit")
             except Exception as e:
                 QMessageBox.critical(self, "Error", str(e))
 

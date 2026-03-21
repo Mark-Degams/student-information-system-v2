@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QColor
-from app.widgets.badge import load_badge_colors, save_badge_color
 import app.database as db
+from app.widgets.base_modal import BaseModal
+from app.widgets.badge import load_badge_colors, save_badge_color
+from app.validators import validate_college_code, validate_college_name
 
-class CollegeModal(QWidget):
+class CollegeModal(BaseModal):
     def __init__(self, parent=None, *, code="", name="",
                  bg_color="#e2e8f0", fg_color="#4a5568",
                  edit_mode=False, on_save=None, on_cancel=None):
@@ -19,6 +21,7 @@ class CollegeModal(QWidget):
 
         self.setFixedWidth(500)
         self.build_ui(code, name)
+        self.val_timer.start(0)
 
     def build_ui(self, code, name):
         lay = QVBoxLayout(self)
@@ -29,15 +32,15 @@ class CollegeModal(QWidget):
         lay.addWidget(lbl)
         self.inp_code = QLineEdit(code)
         self.inp_code.setObjectName("mdl_input")
-        self.inp_code.setPlaceholderText("e.g. BSCS")
-        self.inp_code.setMaxLength(10)
+        self.inp_code.setPlaceholderText("e.g. CCS")
+        self.inp_code.setMaxLength(8)
         lay.addWidget(self.inp_code)
 
         lbl = QLabel("COLLEGE NAME"); lbl.setObjectName("mdl_lbl")
         lay.addWidget(lbl)
         self.inp_name = QLineEdit(name)
         self.inp_name.setObjectName("mdl_input")
-        self.inp_name.setPlaceholderText("e.g. Bachelor of Science in Computer Science")
+        self.inp_name.setPlaceholderText("e.g. College of Computer Studies")
         lay.addWidget(self.inp_name)
 
         lbl = QLabel("BADGE COLOR"); lbl.setObjectName("mdl_lbl")
@@ -71,14 +74,19 @@ class CollegeModal(QWidget):
         
         lay.addWidget(frame)
 
+        self.install_tooltip_filter(self.inp_code)
+        self.install_tooltip_filter(self.inp_name)
+
         lay.addSpacing(6)
         btns = QHBoxLayout(); btns.setSpacing(10); btns.addStretch()
         cancel = QPushButton("Cancel"); cancel.setObjectName("cancel_btn")
-        save   = QPushButton("Save");   save.setObjectName("save_btn")
+        self.save_btn = QPushButton("Save"); self.save_btn.setObjectName("save_btn")
         cancel.clicked.connect(self.handle_cancel)
-        save.clicked.connect(self.validate_and_save)
+        self.save_btn.clicked.connect(self.validate_and_save)
         btns.addWidget(cancel)
-        btns.addWidget(save)
+        btns.addWidget(self.save_btn)
+        self.inp_code.textChanged.connect(self.on_input_changed)
+        self.inp_name.textChanged.connect(self.on_input_changed)
         lay.addLayout(btns)
 
     def make_section(self, layout):
@@ -105,25 +113,38 @@ class CollegeModal(QWidget):
         self.close()
 
     def validate_and_save(self):
+        if not self.all_fields_filled():
+            return
         code = self.inp_code.text().strip().upper()
-        if db.college_code_exists(code):
-            if self.edit_mode:
-                if code != self.orig_code:
-                    QMessageBox.warning(self, "Validation", "College code already exists.")
-                    return
-            else:
-                QMessageBox.warning(self, "Validation", "College code already exists.")
-                return
-        if not self.inp_code.text().strip():
-            QMessageBox.warning(self, "Validation", "College code is required.")
-            return
-        if not self.inp_name.text().strip():
-            QMessageBox.warning(self, "Validation", "College name is required.")
-            return
         if self.on_save:
             save_badge_color(code, self.bg_color, self.fg_color)
             self.on_save(*self.get_data())
         self.close()
+
+    def all_fields_filled(self) -> bool:
+        return bool(self.inp_code.text().strip() and self.inp_name.text().strip())
+
+    def update_save_btn(self):
+        self.save_btn.setEnabled(self.all_fields_filled())
+
+    def run_validation(self):
+        if not self.user_touched:
+            return
+        ok = True
+
+        state, tip = validate_college_code(self.inp_code.text(), self.edit_mode, self.orig_code)
+        if state is not None:
+            self.set_field_state(self.inp_code, state, tip)
+        if state != "valid":
+            ok = False
+
+        state, tip = validate_college_name(self.inp_name.text())
+        if state is not None:
+            self.set_field_state(self.inp_name, state, tip)
+        if state != "valid":
+            ok = False
+
+        self.save_btn.setEnabled(ok)
 
     def get_data(self) -> tuple:
         return (

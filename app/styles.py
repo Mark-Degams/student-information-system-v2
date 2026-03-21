@@ -275,6 +275,18 @@ QLineEdit#mdl_input, QComboBox#mdl_combo, QSpinBox#mdl_spin {
 QLineEdit#mdl_input:focus, QComboBox#mdl_combo:focus, QSpinBox#mdl_spin:focus {
     border-color: #4a6fa5;
 }
+QLineEdit#mdl_input[state="error"], QComboBox#mdl_combo[state="error"] {
+    border: 1.5px solid #e53e3e;
+    background: #fff5f5;
+}
+QLineEdit#mdl_input[state="valid"], QComboBox#mdl_combo[state="valid"] {
+    border: 1.5px solid #38a169;
+    background: #f0fff4;
+}
+QPushButton#save_btn:disabled {
+    background: #a0aec0;
+    color: #e2e8f0;
+}
 QComboBox#mdl_combo::drop-down { border: none; width: 24px; }
 QComboBox#mdl_combo QAbstractItemView {
     background: white; border: 1px solid #e2e8f0;
