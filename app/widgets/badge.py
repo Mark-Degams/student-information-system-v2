@@ -4,7 +4,7 @@ from pathlib import Path
 from app.styles import BADGE_COLORS
 import json
 
-COLORS_FILE = Path(__file__).resolve().parent / "data" / "badge_colors.json"
+COLORS_FILE = Path(__file__).resolve().parent.parent / "data" / "badge_colors.json"
 
 def make_badge(text: str, college_code: str = None) -> QLabel:
     lbl = QLabel(text)
