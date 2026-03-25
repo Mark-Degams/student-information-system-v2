@@ -1,4 +1,4 @@
-# SSIS — Student Information System
+# SSIS — Simple Student Information System
 
 A desktop application built with **PyQt5** for managing students, programs, and colleges in an academic institution. Supports role-based access, real-time search, inline form validation, and paginated data tables.
 
