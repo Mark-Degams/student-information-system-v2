@@ -42,7 +42,7 @@ class LoadingScreen(QWidget):
         lay.addWidget(logo_lbl)
         lay.addSpacing(10)
 
-        sub = QLabel("Student Information System")
+        sub = QLabel("Simple Student Information System")
         sub.setAlignment(Qt.AlignCenter)
         sub.setStyleSheet("color: rgba(255,255,255,0.45); font-size: 13px; letter-spacing: 0.5px;")
         lay.addWidget(sub)

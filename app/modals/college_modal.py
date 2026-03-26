@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QColor
 import app.database as db
-from app.widgets.base_modal import BaseModal
+from app.modals.base_modal import BaseModal
 from app.widgets.badge import load_badge_colors, save_badge_color
 from app.validators import validate_college_code, validate_college_name
 

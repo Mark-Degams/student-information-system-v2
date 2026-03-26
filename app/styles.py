@@ -171,7 +171,7 @@ QTableWidget::item {
     border-bottom: 1px solid rgba(0,0,0,0.04);
 }
 QTableWidget::item:selected {
-    background: rgba(90,127,168,0.10);
+    background: rgba(90,127,168,0.20);
     color: #2d3748;
 }
 QHeaderView::section {
@@ -343,6 +343,66 @@ QTableWidget#delete_table {
     gridline-color: #e2e8f0;
 }
 QTableWidget#delete_table QHeaderView::section {
+    background: #f0f2f5;
+    font-size: 11px;
+    font-weight: 700;
+    color: #718096;
+    padding: 6px 14px;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+/* --- PROFILE MODAL ---------------------------------------------------- */
+QFrame#prof_card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+QLabel#prof_name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #2d3748;
+}
+QLabel#prof_sub {
+    font-size: 12px;
+    color: #718096;
+}
+QLabel#prof_section_title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+QLabel#prof_field_lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a0aec0;
+    min-width: 90px;
+}
+QLabel#prof_field_val {
+    font-size: 13px;
+    color: #2d3748;
+}
+QLabel#prof_placeholder {
+    font-size: 13px;
+    color: #a0aec0;
+    font-style: italic;
+    padding: 8px 0px;
+}
+QFrame#prof_divider {
+    color: #e2e8f0;
+    background: #e2e8f0;
+    max-height: 1px;
+    border: none;
+}
+QTableWidget#prof_table {
+    background: #f7fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 12px;
+    gridline-color: #e2e8f0;
+}
+QTableWidget#prof_table QHeaderView::section {
     background: #f0f2f5;
     font-size: 11px;
     font-weight: 700;

@@ -29,6 +29,7 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 - **Student management** — Add, edit, delete students with ID, name, course, year level, and gender. Course selection is filtered by college first to reduce clutter
 - **Program management** — Add, edit, delete academic programs linked to a college
 - **College management** — Add, edit, delete colleges with custom badge colors (background + text) per college
+- **Profiles** — Double click on any row to open Students, Programs,  Colleges profiles
 - **Real-time search** — 200ms debounced search across all table pages with multisearch capabilities; student page supports field-specific filtering (ID, First Name, Last Name, Course) and intersecting multiple criteria
 - **Inline form validation** — 300ms debounced validation on all modal inputs with red/green border feedback and hover tooltips showing error messages. Save button is disabled until all fields are valid
 - **Pagination** — 50 records per page with page range, prev/next, and go-to-page input

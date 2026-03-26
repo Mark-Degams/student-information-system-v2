@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import QMessageBox, QMenu, QAction
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
-from app.widgets.group_modal import GroupEditModal
+from app.modals.group_modal import GroupEditModal
 from app.modals.student_modal import StudentModal
 from app.modals.delete_modal import DeleteModal
+from app.modals.profile_modal import StudentProfile, ProfileOverlay
 import app.database as db
 
 
@@ -18,6 +19,7 @@ class StudentWin(TablePage):
         super().__init__(parent)
         self.overlay = None
         self.show_notify = show_notify
+        self.table.cellDoubleClicked.connect(self.on_double_click)
         self.load()
 
     def open_modal(self, modal_widget: StudentModal):
@@ -65,6 +67,18 @@ class StudentWin(TablePage):
         menu.addSeparator()
         menu.addAction(delete_action)
         menu.exec_(self.table.viewport().mapToGlobal(pos))
+
+    def on_double_click(self, row, col):
+        rec = self.row_rec(row)
+        if rec:
+            ProfileOverlay(self, StudentProfile(rec))
+
+    def row_rec(self, row):
+        sid = self.table.item(row, 0)
+        if not sid:
+            return None
+        rows, _ = db.student_list(sid.text(), "id", True, 1, 0, "ID")
+        return rows[0] if rows else None
 
     def group_edit_course(self, selected):
         rows = [[r["id"], r["firstname"], r["lastname"], r["course"] or "N/A"] for r in selected]

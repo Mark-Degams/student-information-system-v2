@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QLabel, QMessageBox
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
 from app.modals.college_modal import CollegeModal
 from app.modals.delete_modal import DeleteModal
+from app.modals.profile_modal import CollegeProfile, ProfileOverlay
 from app.widgets.badge import delete_badge_color
 import app.database as db
 
@@ -17,6 +18,7 @@ class CollegeWin(TablePage):
         super().__init__(parent)
         self.overlay = None
         self.show_notify = show_notify
+        self.table.cellDoubleClicked.connect(self.on_double_click)
         self.load()
 
     def open_modal(self, modal_widget: CollegeModal):
@@ -41,6 +43,18 @@ class CollegeWin(TablePage):
             on_edit=lambda _, r=rec: self.edit(r),
             on_delete=lambda _, r=rec: self.delete(r),
         )
+
+    def on_double_click(self, row, col):
+        code_item = self.table.item(row, 0)
+        widget = self.table.cellWidget(row, 0)
+        if not widget:
+            return
+        code = widget.findChild(QLabel).text() if widget else None
+        if not code:
+            return
+        rows, _ = db.college_list(code, "code", True, 1, 0)
+        if rows:
+            ProfileOverlay(self, CollegeProfile(rows[0]))
 
     def add_new(self):
         if self.readonly:

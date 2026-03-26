@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 import app.database as db
-from app.widgets.base_modal import BaseModal
+from app.modals.base_modal import BaseModal
 from app.validators import validate_program_code, validate_program_name
 
 class ProgramModal(BaseModal):

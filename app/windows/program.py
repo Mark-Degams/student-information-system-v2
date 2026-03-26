@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import QMessageBox, QMenu, QAction
 from PyQt5.QtCore import Qt
 from app.widgets.table import TablePage
 from app.widgets.modal_overlay import ModalOverlay
-from app.widgets.group_modal import GroupEditModal
+from app.modals.group_modal import GroupEditModal
 from app.modals.program_modal import ProgramModal
 from app.modals.delete_modal import DeleteModal
+from app.modals.profile_modal import ProgramProfile, ProfileOverlay
 import app.database as db
 
 class ProgramWin(TablePage):
@@ -17,6 +18,7 @@ class ProgramWin(TablePage):
         super().__init__(parent)
         self.overlay = None
         self.show_notify = show_notify
+        self.table.cellDoubleClicked.connect(self.on_double_click)
         self.load()
 
     def open_modal(self, modal_widget: ProgramModal):
@@ -50,16 +52,19 @@ class ProgramWin(TablePage):
         if len(selected) < 2:
             return
 
-        menu = QMenu(self)
-        menu.setStyleSheet("""
-            QMenu { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px; }
-            QMenu::item { padding: 8px 20px; border-radius: 6px; font-size: 13px; color: #2d3748; }
-            QMenu::item:selected { background: #edf2f7; }
-        """)
+        menu = QMenu(self); menu.setObjectName("group_select_menu")
         edit_action = QAction(f"Group Edit ({len(selected)} programs)", self)
         edit_action.triggered.connect(lambda: self.group_edit(selected))
         menu.addAction(edit_action)
         menu.exec_(self.table.viewport().mapToGlobal(pos))
+
+    def on_double_click(self, row, col):
+        code_item = self.table.item(row, 0)
+        if not code_item:
+            return
+        rows, _ = db.program_list(code_item.text(), "code", True, 1, 0)
+        if rows:
+            ProfileOverlay(self, ProgramProfile(rows[0]))
 
     def group_edit(self, selected):
         rows = [[r["code"], r["name"], r["college"] or "N/A"] for r in selected]
