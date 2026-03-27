@@ -176,6 +176,12 @@ def get_programs_with_college() -> list:
         ).fetchall()
     return [dict(r) for r in rows]
 
+def get_college_by_program(program_code: str) -> str | None:
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT college FROM program WHERE code=?", (program_code,)
+        ).fetchone()
+    return row[0] if row else None
 
 # --- STUDENT ------------------------------------------------------------------
 

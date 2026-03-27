@@ -90,13 +90,7 @@ class StudentModal(BaseModal):
             self.on_college_changed("Unregistered")
             return
 
-        all_programs = db.get_programs_with_college()
-        college_of_course = None
-        for p in all_programs:
-            if p["code"] == course:
-                college_of_course = p["college"]
-                break
-
+        college_of_course = db.get_college_by_program(course)
         if college_of_course:
             self.inp_college.setCurrentText(college_of_course)
             self.on_college_changed(college_of_course)

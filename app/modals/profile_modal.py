@@ -86,8 +86,16 @@ class StudentProfile(QWidget):
         div.setObjectName("prof_divider"); lay.addWidget(div)
 
         grid = QGridLayout(); grid.setSpacing(10)
+
+        course_code = r.get("course")
+        if course_code:
+            college_code = db.get_college_by_program(course_code)
+            course_display = f"{college_code} - {course_code}" if college_code else f"Unassigned - {course_code}"
+        else:
+            course_display = "Not enrolled"
+
         fields = [
-            ("Course",     r.get("course") or "Not enrolled"),
+            ("Course",     course_display),
             ("Year Level", f"Year {r.get('year', '—')}"),
             ("Gender",     r.get("gender", "—")),
         ]
