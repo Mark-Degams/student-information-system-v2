@@ -228,7 +228,7 @@ Each college can have a custom background and text color for its badge displayed
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
