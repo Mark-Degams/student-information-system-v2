@@ -11,7 +11,6 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 
 - [Features](#features)
 - [Technologies](#technologies)
-- [Screenshots](#screenshots)
 - [Project Structure](#project-structure)
 - [Database Schema](#database-schema)
 - [Installation](#installation)
@@ -39,7 +38,7 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - **Python 3.10+** — Core programming language
 - **PyQt5** — GUI framework for desktop application
@@ -48,7 +47,7 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Simple Student Information System v2/
@@ -129,7 +128,7 @@ CREATE TABLE student (
 
 ---
 
-## 🚀 Installation
+## Installation
 
 **Requirements:** Python 3.10+
 
@@ -162,7 +161,7 @@ python main.py
 
 ---
 
-## 💻 Usage
+## Usage
 
 ### Login Credentials
 - **Admin**: Username: `admin`, Password: `password`
