@@ -19,8 +19,6 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 - [Architecture Notes](#architecture-notes)
 - [Badge Colors](#badge-colors)
 - [License](#license)
-- [Badge Colors](#badge-colors)
-- [License](#license)
 
 ## Features
 
@@ -37,6 +35,7 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 - **Delete confirmation modals** — Shows a list of affected related records before confirming a destructive delete
 - **Drag-and-drop modals** — All modal dialogs are draggable within the window
 - **Toast notifications** — Success, edit, and delete notifications appear after each action
+- **Group Edit** — Click and drag on students/programs and right clicked to enable multiple edit
 
 ---
 
@@ -46,12 +45,6 @@ A desktop application built with **PyQt5** for managing students, programs, and 
 - **PyQt5** — GUI framework for desktop application
 - **SQLite** — Embedded database for data persistence
 - **QSS (Qt Style Sheets)** — Custom styling and theming
-
----
-
-## 📸 Screenshots
-
-*Add screenshots of the application here to showcase the UI and features.*
 
 ---
 
@@ -73,20 +66,20 @@ Simple Student Information System v2/
 │   ├── data/
 │   │   ├── badge_colors.json      # Custom badge color configurations
 │   │   ├── db_gen.py              # Database schema initialization
-│   │   └── preset_data.py         # Sample data generation utilities
-│   │
-│   ├── icons/                     # SVG icons for UI elements
+│   │   ├── preset_data.py         # Sample data generation utilities
+│   │   └── icons/                 # SVG icons for UI elements
 │   │
 │   ├── modals/
+│   │   ├── base_modal.py          # Base modal class with validation and UI logic
 │   │   ├── college_modal.py       # College add/edit modal
 │   │   ├── delete_modal.py        # Generic delete confirmation modal
+│   │   ├── group_modal.py         # Group operations modal
+│   │   ├── profile_modal.py       # Profile details modal
 │   │   ├── program_modal.py       # Program add/edit modal
 │   │   └── student_modal.py       # Student add/edit modal
 │   │
 │   ├── widgets/
 │   │   ├── badge.py               # College badge rendering and color management
-│   │   ├── base_modal.py          # Base modal class with validation and UI logic
-│   │   ├── group_modal.py         # Group operations modal
 │   │   ├── modal_overlay.py       # Modal overlay wrapper for positioning
 │   │   ├── notification.py        # Toast notification system
 │   │   ├── pagination.py          # Pagination controls widget
